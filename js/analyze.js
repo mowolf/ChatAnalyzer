@@ -102,6 +102,8 @@ function displayContents(contents) {
         break;
       }
     }
+    // filter out most common words
+
 
     // Most used emojies
 
@@ -650,9 +652,6 @@ function getWordCount(messages) {
 
 // 30 most used emoji per person
 
-
-
-//
 
 // count media
 // TAG <‎Bild weggelassen> in GERMAN
