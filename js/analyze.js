@@ -27,42 +27,201 @@ function readSingleFile(e) {
 // Display all data
 function displayContents(contents) {
 
-  // Array with objects name, message, date, time
+  // contents with objects name, message, date, time
 
-  // USERS
   // TODO: make carousell for groups
-  // for two USERS i = 0,1
+  // TODO: make it more viewable
+
+  // User specific  ------------------------------------------------
+  var wordsPerMessage = [];
   for (var i = 0; i < 2; i++) {
+    // message Count ----------------------------------------
     var messagesCount = "0";
     messagesCount = contents[i].message.length;
-    // console.log(messagesCount);
+
+    // Words per message ------------------------------------
+    // returns [avergeWordsPerMessage,tolatWords];
+    wordsPerMessage[i] = calcWordsPerMessage(contents[i].message);
+
+    // Most used words --------------------------------------
+    var Words = getWordCount(contents[i].message);
+    var str4Pic = ["_<‎bild","_<picture"];
+    var sentPicsIndex = [-1,-1];
+    var sentAudioIndex = [-1,-1];
+
+    // create &sort most Used array
+    var mostUsed = [["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
+                    ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
+                    ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],];
+    for (var key in Words) {
+      if (Words.hasOwnProperty(key)) {
+        // evaluate the rest
+        for (var j = 0; j < 30; j++) {
+          if (Words[key] > mostUsed[j][1]){
+            mostUsed.splice( j, 0, [key, Words[key]]);
+            break;
+          }
+        }
+      }
+    }
+
+    // evaluate how many pics were sent
+    for (var j = 0; j < mostUsed.length; j++) {
+      if (mostUsed[j][0] == str4Pic[0]) {
+        sentPicsIndex[i] = j;
+        break;
+      }
+    }
+    // remove it from the array
+    mostUsed.splice(sentPicsIndex[i], 1);
+
+    // --  evaluate how many audio files were sent
+    for (var j = 0; j < mostUsed.length; j++) {
+      if (mostUsed[j][0] == "_<audio") {
+        sentAudioIndex[i] = j;
+        break;
+      }
+    }
+    // remove it from array
+    mostUsed.splice(sentAudioIndex[i], 1);
+
+    // renove unwanted words
+    // find position of "weggelassen>"
+    // TODO: Add other languages
+    var endOfMedia = ["_weggelassen>"]
+
+    for (var j = 0; j < mostUsed.length; j++) {
+      if (mostUsed[j][0] == endOfMedia[0]) {
+        mostUsed.splice(j, 1);
+        break;
+      }
+    }
+    for (var j = 0; j < mostUsed.length; j++) {
+      if (mostUsed[j][0] == "") {
+        mostUsed.splice(sentPicsIndex[j], 1);
+        break;
+      }
+    }
+
+    // Most used emojies
+
+    // HTML CONSTRUCTION ------------------------------------
+    var mostUsedHTML ="";
+    console.log(wordsPerMessage[i][1]);
+    for (var j = 0; j < 30; j++) {
+      mostUsedHTML = mostUsedHTML + "<p>" + mostUsed[j][0].substring(1) +" - "+ Math.round(mostUsed[j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
+    }
+
+    var btn = "<button type='button' class='btn' data-toggle='collapse' data-target='#mostUsed"+i+"''>" +
+              "<i class='fas fa-chevron-down'></i></button>";
 
     var div = document.createElement('div');
     div.className = 'col-sm';
-
     div.innerHTML = "<h4>" + contents[i].name + "</h4>" +
-                    "<p> Messages sent: <b>" + messagesCount + "</b></p>";
-
+                    "<p> Messages sent: <b>" + messagesCount + "</b></p>" +
+                    "<p> Words per Message: <b>" + wordsPerMessage[i][0] + "</b></p>" +
+                    "<p> Pictures sent: " + mostUsed[sentPicsIndex[i]][1] + "</p>" +
+                    "<p>"+ btn + "<b> Most used words:</b></p>"+
+                    "<div id='mostUsed"+i+"' class='collapse in'>" + mostUsedHTML + "</div>";
     document.getElementById('users').appendChild(div);
+
   }
 
-  // factor ---
-  if (contents[0].message.length > contents[1].message.length) {
-    factor = Math.round((contents[0].message.length/contents[1].message.length)*100)/100;
-    factor = contents[0].name + "writes <b>" + factor + "</b> times more messages!";
-  } else {
-    factor = Math.round((contents[1].message.length/contents[0].message.length)*100)/100;
-    factor = contents[1].name + " writes <b>" + factor + "</b> times more messages!";
+  // words bar Graph
+/*
+  for (var i = 0; i < 30; i++) {
+    barData = mostUsed[i][0];
+    barLabes = mostUsed[i][1];
   }
-
-  var div = document.createElement('div');
-  div.className = 'mb-0';
-  div.innerHTML = "<p>" + factor + "</p>";
-  document.getElementById('usersRows').appendChild(div);
-
-  // Messages per Day Radar ---
-  dayCount = [getMessagesPerDay(contents[0].date), getMessagesPerDay(contents[1].date)];
   new Chart(
+      document.getElementById("barWords"),
+      {
+      "type":"bar",
+      "data":{"labels":[ ['Monday', ''],"Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+      "datasets":[
+        {"label":barLabes,
+        "data":barData,
+        "fill":true,"backgroundColor":"rgba(20, 168, 204, 0.2)",
+        "borderColor":"rgb(20, 168, 204)",
+        "pointBackgroundColor":"rgb(20, 168, 204)",
+        "pointBorderColor":"#fff","pointHoverBackgroundColor":"#fff",
+        "pointHoverBorderColor":"rgb(20, 168, 204)"}],
+        options: {
+        legend: {
+          display: false
+      },
+      layout: {
+          padding: {
+            top: 20
+          }
+      },
+      showLabelsOnBars:true,
+      barLabelFontColor:"gray",
+      animation: {
+          duration: 0
+      },
+      scales: {
+          yAxes: [{
+              stacked: true,
+              display: false,
+              ticks: {
+                  beginAtZero:true
+              }
+          }],
+          xAxes: [{
+              stacked: true,
+              id:"ejeX",
+              ticks: {
+                  beginAtZero:true,
+                  fontSize: 30
+                  }}]
+          },
+          plugins: {
+              datalabels: {
+                color: 'black',
+                font: {size: 24},
+                  display: true
+              }
+          }
+      }
+      });
+*/
+
+  // factors ------------------------------------------------------
+
+    if (contents[0].message.length > contents[1].message.length) {
+      factorF = Math.round((contents[0].message.length/contents[1].message.length)*100)/100;
+      wpmF = Math.round(wordsPerMessage[0][0]/wordsPerMessage[1][0]*100)/100;
+      wpm = "And " + contents[0].name + " messages contain <b>" + wpmF + "</b> times the words of " +contents[1].name + " messages!</b>";
+      n = 0;
+    } else {
+      factorF = Math.round((contents[1].message.length/contents[0].message.length)*100)/100;
+      wpmF = Math.round(wordsPerMessage[1][0]/wordsPerMessage[0][0]*100)/100;
+      wpm = "And " + contents[1].name + " messages contain <b>" + wpmF + "</b> times the words of " +contents[0].name + " messages!</b>";
+      n = 1;
+    }
+    factor = contents[n].name + " writes <b>" + factorF + "</b> times more messages!";
+
+    var percent = Math.round((wpmF)*factorF*100);
+    if (percent >= 1) {
+      percent = percent.toString().substring(1,3)  + "</b>% more!";
+    } else {
+      percent = percent  + "</b>% less!";
+    }
+
+    total = "Overall " + contents[n].name +" communicates <b>" + percent;
+
+    var div = document.createElement('div');
+    div.className = 'mb-0';
+    div.innerHTML = "<p>" + factor + "</p>" +
+                    "<p>" + wpm + "</p>" +
+                    "<p>" + total + "</p>";
+    document.getElementById('usersRows').appendChild(div);
+
+
+  // Messages per Day Radar -----------------------------------------
+    dayCount = [getMessagesPerDay(contents[0].date), getMessagesPerDay(contents[1].date)];
+    new Chart(
         document.getElementById("dayRadar"),
         {
         "type":"radar",
@@ -110,13 +269,11 @@ function displayContents(contents) {
     datesFormated = [formatDates(messageCount[0][0].date), formatDates(messageCount[1][0].date)];
     // returns 2DArray [0][0] are the dates and [1][0] and [1][1] the counts
     formatedData = formatAll(messageCount, datesFormated);
-    //console.log(formatedData);
-
     // GRAPH
     var ctx = document.getElementById('chronologicalGraph').getContext('2d');
-    ctx.canvas.width = 1400;
-    ctx.canvas.height = 500;
-  var cfg = {
+      ctx.canvas.width = 1400;
+      ctx.canvas.height = 500;
+      var cfg = {
     type: 'line',
     data: {
       labels: formatedData[0][0],
@@ -174,9 +331,11 @@ function displayContents(contents) {
       }
     }
   };
-    var chart = new Chart(ctx, cfg);
+      var chart = new Chart(ctx, cfg);
 
-  // ------ TESTING END
+  // show chat of clicked day ------------------------------------------------
+
+
 }
 
 
@@ -476,9 +635,21 @@ function countMessages(dates) {
 
 // count words per person
 
-// 30 most used words per person
+// counts how often you use every word
+// thanks to https://stackoverflow.com/a/6565353/7151828
+function getWordCount(messages) {
+    var wordCounts = { };
+    var words = messages.join(" ").split(/[\b\s(?:,| )+]/);
+
+  for (var i = 0; i < words.length; i++) {
+    wordCounts["_" + words[i].toLowerCase()] = (wordCounts["_" + words[i].toLowerCase()] || 0) + 1;
+  }
+  //console.log(wordCounts);
+  return wordCounts;
+}
 
 // 30 most used emoji per person
+
 
 
 //
@@ -490,10 +661,12 @@ function countMessages(dates) {
 // ---- ---- ---- TOTAL STATS
 
 // average words per message
-
-calcWordsPerMessage() {
-
-
+function calcWordsPerMessage(messages) {
+  var tlt = 0;
+  for (var i = 0; i < messages.length; i++) {
+    tlt = tlt + messages[i].trim().split(/\s+/).length;
+  }
+  return [(Math.round(tlt/messages.length*100)/100),tlt];
 }
 
 // average messages per day

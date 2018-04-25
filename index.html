@@ -14,6 +14,7 @@
 
     <!-- Custom fonts for this template -->
     <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
 
@@ -65,7 +66,12 @@
             <!-- colums USER DATA -->
           </div>
 
-          <div class="text-center" id="usersRows">
+          <!-- Words per user -->
+          <div class="row pt-4">
+            <canvas id="barWords"></canvas>
+          </div>
+
+          <div class="text-center pt-3 pb-2 userRows text-white" id="usersRows">
             <!-- colums USER DATA -->
           </div>
 
@@ -78,7 +84,6 @@
           <div class="row pt-4">
             <canvas id="chronologicalGraph"></canvas>
           </div>
-
 
 
       </div>
@@ -127,6 +132,9 @@
     <!-- chart.js -->
     <script src="js/moment.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.3.0/dist/chartjs-plugin-datalabels.min.js"></script>-->
+
+    <!-- underscore.js-->
 
     <!-- My own scripts to analyze the chat file -->
     <script src="js/analyze.js"></script>
