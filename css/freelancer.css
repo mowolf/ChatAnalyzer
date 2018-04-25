@@ -1,9 +1,16 @@
 
-
+.results {
+  display:none;
+}
 
 .userRows {
   background-color: rgba(24, 188, 156, 0.9);
 }
+
+
+
+
+
 
 
 body {

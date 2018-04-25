@@ -9,16 +9,34 @@ function readSingleFile(e) {
 
   // execude on load of file
   reader.onload = function(e) {
+
+    // TODO: Clear Page for display
+    // clearPage();
+    // Hide tutorial
+    var tut = document.getElementById("tutorial");
+    tut.style.display = "none";
+    var res = document.getElementById("results");
+    res.style.display = "block";
+
     var contents = e.target.result;
 
     // get data in right format
     lineArray = createArray(contents);
     var structArray = createStructs(lineArray);
-    // log data
-    //console.log(structArray);
 
-    // display Contents
-    displayContents(structArray);
+    if (structArray.length > 2) {
+      // groups not supported yet!
+      // TODO: Make a nice html thing and do not append it
+      var div = document.createElement('div');
+      div.innerHTML = "<h1> Group Chat is not supported yet ! :(</h1>";
+      document.getElementById('users').appendChild(div);
+
+    } else {
+      // normal chat
+      // display Contents
+      displayContents(structArray);
+    }
+
   };
   reader.readAsText(file);
 }
@@ -29,8 +47,7 @@ function displayContents(contents) {
 
   // contents with objects name, message, date, time
 
-  // TODO: make carousell for groups
-  // TODO: make it more viewable
+  // TODO: add group support (make carousell for groups)
 
   // User specific  ------------------------------------------------
   var wordsPerMessage = [];
@@ -42,6 +59,8 @@ function displayContents(contents) {
     // Words per message ------------------------------------
     // returns [avergeWordsPerMessage,tolatWords];
     wordsPerMessage[i] = calcWordsPerMessage(contents[i].message);
+
+    // TODO: get words per messages and plot the change over time
 
     // Most used words --------------------------------------
     var Words = getWordCount(contents[i].message);
