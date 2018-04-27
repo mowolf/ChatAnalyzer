@@ -128,7 +128,7 @@ function displayContents(contents) {
 
     // HTML CONSTRUCTION ------------------------------------
     var mostUsedHTML ="";
-    console.log(wordsPerMessage[i][1]);
+    //console.log(wordsPerMessage[i][1]);
     for (var j = 0; j < 30; j++) {
       mostUsedHTML = mostUsedHTML + "<p>" + mostUsed[j][0].substring(1) +" - "+ Math.round(mostUsed[j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
     }
@@ -211,17 +211,17 @@ function displayContents(contents) {
   // factors ------------------------------------------------------
 
     if (contents[0].message.length > contents[1].message.length) {
-      factorF = Math.round((contents[0].message.length/contents[1].message.length)*100)/100;
-      wpmF = Math.round(wordsPerMessage[0][0]/wordsPerMessage[1][0]*100)/100;
-      wpm = "And " + contents[0].name + " messages contain <b>" + wpmF + "</b> times the words of " +contents[1].name + " messages!</b>";
-      n = 0;
+      var factorF = Math.round((contents[0].message.length/contents[1].message.length)*100)/100;
+      var wpmF = Math.round(wordsPerMessage[0][0]/wordsPerMessage[1][0]*100)/100;
+      var wpm = "And " + contents[0].name + " messages contain <b>" + wpmF + "</b> times the words of " +contents[1].name + " messages!</b>";
+      var n = 0;
     } else {
-      factorF = Math.round((contents[1].message.length/contents[0].message.length)*100)/100;
-      wpmF = Math.round(wordsPerMessage[1][0]/wordsPerMessage[0][0]*100)/100;
-      wpm = "And " + contents[1].name + " messages contain <b>" + wpmF + "</b> times the words of " +contents[0].name + " messages!</b>";
-      n = 1;
+      var factorF = Math.round((contents[1].message.length/contents[0].message.length)*100)/100;
+      var wpmF = Math.round(wordsPerMessage[1][0]/wordsPerMessage[0][0]*100)/100;
+      var wpm = "And " + contents[1].name + " messages contain <b>" + wpmF + "</b> times the words of " +contents[0].name + " messages!</b>";
+      var n = 1;
     }
-    factor = contents[n].name + " writes <b>" + factorF + "</b> times more messages!";
+    var factor = contents[n].name + " writes <b>" + factorF + "</b> times more messages!";
 
     var percent = Math.round((wpmF)*factorF*100);
     if (percent >= 1) {
@@ -230,7 +230,7 @@ function displayContents(contents) {
       percent = percent  + "</b>% less!";
     }
 
-    total = "Overall " + contents[n].name +" communicates <b>" + percent;
+    var total = "Overall " + contents[n].name +" communicates <b>" + percent;
 
     var div = document.createElement('div');
     div.className = 'mb-0';
@@ -239,39 +239,48 @@ function displayContents(contents) {
                     "<p>" + total + "</p>";
     document.getElementById('usersRows').appendChild(div);
 
-
   // Messages per Day Radar -----------------------------------------
-    dayCount = [getMessagesPerDay(contents[0].date), getMessagesPerDay(contents[1].date)];
+    var dayCount = [getMessagesPerDay(contents[0].date), getMessagesPerDay(contents[1].date)];
+
+    var dataTest= getMessagesPerDay(contents[0].date);
+
+    var a = 2000;
+    var b = parseInt(dayCount[0][1]);
+    console.log([parseInt(dayCount[0][0]),parseInt(dayCount[0][1]),parseInt(dayCount[0][2]),parseInt(dayCount[0][3]),parseInt(dayCount[0][4]),parseInt(dayCount[0][5]),parseInt(dayCount[0][6])]);
+
     new Chart(
         document.getElementById("dayRadar"),
         {
-        "type":"radar",
-        "data":{"labels":[ ['Monday', ''],"Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-        "datasets":[
-          {"label":contents[0].name,
-          "data":dayCount[0],
-          "fill":true,"backgroundColor":"rgba(20, 168, 204, 0.2)",
-          "borderColor":"rgb(20, 168, 204)",
-          "pointBackgroundColor":"rgb(20, 168, 204)",
-          "pointBorderColor":"#fff","pointHoverBackgroundColor":"#fff",
-          "pointHoverBorderColor":"rgb(20, 168, 204)"},
-          {"label":contents[1].name,
-          "data":dayCount[1],
-          "fill":true,"backgroundColor":"rgba(255, 72, 64, 0.2)",
-          "borderColor":"rgb(255, 72, 64)",
-          "pointBackgroundColor":"rgb(255, 72, 64)",
-          "pointBorderColor":"#fff",
-          "pointHoverBackgroundColor":"#fff",
-          "pointHoverBorderColor":"rgb(255, 72, 64)"}]},
-        "options":{
-            "elements":{
-              "line":{
-                "tension":0,
-                "borderWidth":3
+        type:"radar",
+        data:{labels:[ ["Monday", ""],"Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        datasets:[
+          {label:contents[0].name,
+          data:dayCount[0],
+          fill:true,
+          backgroundColor:"rgba(20, 168, 204, 0.2)",
+          borderColor:"rgb(20, 168, 204)",
+          pointBackgroundColor:"rgb(20, 168, 204)",
+          pointBorderColor:"#fff",
+          pointHoverBackgroundColor:"#fff",
+          pointHoverBorderColor:"rgb(20, 168, 204)"},
+          {label:contents[1].name,
+          data:dayCount[1],
+          fill:true,
+          backgroundColor:"rgba(255, 72, 64, 0.2)",
+          borderColor:"rgb(255, 72, 64)",
+          pointBackgroundColor:"rgb(255, 72, 64)",
+          pointBorderColor:"#fff",
+          pointHoverBackgroundColor:"#fff",
+          pointHoverBorderColor:"rgb(255, 72, 64)"}]},
+        options:{
+            elements:{
+              line:{
+                tension:0,
+                borderWidth:3
               }
             },
-            "scale":{
-              "ticks": {
+            scale:{
+              ticks: {
                 beginAtZero: true
               },
               pointLabels :{
@@ -292,17 +301,17 @@ function displayContents(contents) {
     formatedData = formatAll(messageCount, datesFormated);
     // GRAPH
     var ctx = document.getElementById('chronologicalGraph').getContext('2d');
-      ctx.canvas.width = 1400;
-      ctx.canvas.height = 500;
-      var cfg = {
-    type: 'line',
-    data: {
+    ctx.canvas.width = 1400;
+    ctx.canvas.height = 500;
+    var cfg = {
+      type: 'line',
+      data: {
       labels: formatedData[0][0],
       datasets: [{
         label: contents[0].name,
         data: formatedData[0][1][0],
         type: 'line',
-        fill: false,
+        fill: true,
         steppedLine: true,
         pointRadius: 0,
         lineTension: 0,
@@ -330,7 +339,7 @@ function displayContents(contents) {
         "pointHoverBackgroundColor":"#fff",
         "pointHoverBorderColor":"rgb(255, 72, 64)"}]
     },
-    options: {
+        options: {
       scales: {
         xAxes: [{
           type: 'time',
@@ -584,11 +593,11 @@ function formatAll(data, datesF) {
 
 // activity by day of week
 function getMessagesPerDay(dates) {
-  dayCount = [0,0,0,0,0,0,0];
+  var dayCount = [0,0,0,0,0,0,0];
 
   // check and reformat date to american standard MM.DD.YYY
   var reformat = false;
-  for (i = 0; i < dates.length; i++) {
+  for (var i = 0; i < dates.length; i++) {
     if (dates[i].substring(0,2) > 12) {
         // reformat
         reformat = true;
@@ -598,18 +607,23 @@ function getMessagesPerDay(dates) {
       break;
     }
   }
+  console.log(reformat);
 
   // evaluate and count
   for (i = 0; i < dates.length; i++) {
     if (reformat) {
-      var d = new Date(dates[i].substring(3,6) + dates[i].substring(0,3) + dates[i].substring(6));
+      var d = new Date("20"+dates[i].substring(6,7)+"-"+dates[i].substring(3,5) +"-" +dates[i].substring(0,2));
     } else {
-      var d = new Date(dates[i]);
+      var d = new Date(("20"+dates[i].substring(6,7)+"-"+dates[i].substring(0,2) +"-" +dates[i].substring(3,5)));
     }
-    dayNum = d.getDay();
+    var dayNum = d.getDay();
+
     //console.log("index" + i + "DayNum:" + dayNum + "Date:" + d + "Input:" + dates[i]);
     dayCount[dayNum]++;
   }
+  i = 0;
+    //console.log(dayNum);
+    //console.log(d);
   return dayCount;
 }
 
