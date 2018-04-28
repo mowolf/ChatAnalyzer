@@ -300,6 +300,8 @@ function displayContents(contents) {
     // returns 2DArray [0][0] are the dates and [1][0] and [1][1] the counts
     formatedData = formatAll(messageCount, datesFormated);
     // GRAPH
+
+    // BUG: formatedData[0][1][0] not in ISO format!!
     var ctx = document.getElementById('chronologicalGraph').getContext('2d');
     ctx.canvas.width = 1400;
     ctx.canvas.height = 500;
@@ -522,10 +524,12 @@ function formatDates(datesToFormat) {
 
   for (i = 0; i < datesToFormat.length; i ++) {
     // DD MM YY-> D MMM YY
-    var date = '20'+ datesToFormat[i].substring(6,8) + datesToFormat[i].substring(3,5) + datesToFormat[i].substring(0,2);
-    datesFormated[i] = moment(date).format('D MMM YY');
+    var date = '20'+ datesToFormat[i].substring(6,8) +" "+ datesToFormat[i].substring(3,5) +" "+ datesToFormat[i].substring(0,2);
+
+    datesFormated[i] = moment(date, "YYYY MM DD").format('D MMM YY');
   }
 
+  //console.log(date, datesFormated[i-1]);
   return datesFormated;
 }
 
@@ -567,6 +571,7 @@ function formatAll(data, datesF) {
       //Sun May 18 2014 00:00:00 GMT+0200 (CEST)
       dates[j] = moment(dates[j]).format('D MMM YY');
     }
+    console.log(dates);
     /*
     console.log("---DATES---");
     console.log(dates);
@@ -607,7 +612,7 @@ function getMessagesPerDay(dates) {
       break;
     }
   }
-  console.log(reformat);
+  //console.log(reformat);
 
   // evaluate and count
   for (i = 0; i < dates.length; i++) {
