@@ -47,9 +47,6 @@
         <!-- Upload Field -->
 
         <div id="upload" class="text-center">
-
-          <!-- https://stackoverflow.com/questions/4328947/limit-file-format-when-using-input-type-file -->
-
           <label class="btn btn-xl mt-4 btn-secondary">
             <i class="fa fa-mouse-pointer mr-2"></i>
             Select your file! <input type="file" accept=".txt,.zip" id="file-input" hidden>
@@ -57,8 +54,14 @@
 
           <p> </p>
 
-          <div class="alert-box" id="error">
-            You need to select a .txt file!
+          <div class="container error" id="error">
+            <h2>Please unzip your file! Only .txt supported!</h2>
+          </div>
+          <div class="container groups" id="groups">
+            <h2>Group Chat's not supported so far :(.</h2>
+          </div>
+          <div class="container loading" id="loading">
+            <h2>Loading...</h2>
           </div>
 
         </div>

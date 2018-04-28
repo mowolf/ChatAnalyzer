@@ -1,6 +1,15 @@
-
+.error {
+  display: none;
+}
 .results {
   display:none;
+}
+.groups {
+  display: none;
+}
+
+.loading{
+  display: none;
 }
 
 .userRows {

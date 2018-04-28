@@ -1,78 +1,97 @@
+// add file listener for chat file
+document.getElementById('file-input')
+  .addEventListener('change', readSingleFile, false);
+
 //Read File
 function readSingleFile(e) {
 
   var file = e.target.files[0];
-  if (!file) {
+  if ((!file) || (file.type != "text/plain")) {
+    console.log("ERROR! No txt file selected!");
+    var er = document.getElementById("error");
+    er.style.display = "block";
+    // hide old results
+    var res = document.getElementById("results");
+    res.style.display = "none";
     return;
   }
+  console.log(file);
   var reader = new FileReader();
 
   // execude on load of file
   reader.onload = function(e) {
 
-    // TODO: Clear Page for display
-    // clearPage();
-    // Hide tutorial
-    var tut = document.getElementById("tutorial");
-    tut.style.display = "none";
-    var res = document.getElementById("results");
-    res.style.display = "block";
-
     var contents = e.target.result;
-
     // get data in right format
-    lineArray = createArray(contents);
-    var structArray = createStructs(lineArray);
+    var structArray = createStructs(createArray(contents));
 
+    // checks if group chat
     if (structArray.length > 2) {
       // groups not supported yet!
-      // TODO: Make a nice html thing and do not append it
-      var div = document.createElement('div');
-      div.innerHTML = "<h1> Group Chat is not supported yet ! :(</h1>";
-      document.getElementById('users').appendChild(div);
-
+      var res = document.getElementById("groups");
+      res.style.display = "block";
+      return;
     } else {
       // normal chat
       // display Contents
+      // Show loading
+      var d = document.getElementById("loading");
+      d.style.display = "block";
+      // calculate
       displayContents(structArray);
+      // Hide Loading
+      var d = document.getElementById("loading");
+      d.style.display = "none";
     }
+    // Hide tutorial
+    var d = document.getElementById("tutorial");
+    d.style.display = "none";
+    // Hide Error
+    var d = document.getElementById("error");
+    d.style.display = "none";
+    // hide error groups
+    var d = document.getElementById("groups");
+    d.style.display = "none";
+    // show result page
+    var d = document.getElementById("results");
+    d.style.display = "block";
 
   };
   reader.readAsText(file);
 }
 
-
 // Display all data
 function displayContents(contents) {
 
-  // contents with objects name, message, date, time
-
   // TODO: add group support (make carousell for groups)
+  // TODO: add words per messages and plot the change over time
 
-  // User specific  ------------------------------------------------
+  // contents is an object: name, message, date, time
+
+// User specific  ------------------------------------------------
   var wordsPerMessage = [];
   for (var i = 0; i < 2; i++) {
-    // message Count ----------------------------------------
-    var messagesCount = "0";
-    messagesCount = contents[i].message.length;
+  // message Count ----------------------------------------
+  var messagesCount = "0";
+  messagesCount = contents[i].message.length;
 
-    // Words per message ------------------------------------
-    // returns [avergeWordsPerMessage,tolatWords];
-    wordsPerMessage[i] = calcWordsPerMessage(contents[i].message);
+  // Words per message ------------------------------------
+  // returns [avergeWordsPerMessage,tolatWords];
+  wordsPerMessage[i] = calcWordsPerMessage(contents[i].message);
 
-    // TODO: get words per messages and plot the change over time
+  // Most used words --------------------------------------
+  var Words = getWordCount(contents[i].message);
+  var str4Pic = ["_<‎bild","_<picture"];
+  var sentPicsIndex = [-1,-1];
+  var sentAudioIndex = [-1,-1];
+  var sentAudioCount = [0,0];
+  var sentPicsCount = [0,0];
 
-    // Most used words --------------------------------------
-    var Words = getWordCount(contents[i].message);
-    var str4Pic = ["_<‎bild","_<picture"];
-    var sentPicsIndex = [-1,-1];
-    var sentAudioIndex = [-1,-1];
-
-    // create &sort most Used array
-    var mostUsed = [["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
+  // create &sort most Used array
+  var mostUsed = [["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
                     ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
                     ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],];
-    for (var key in Words) {
+  for (var key in Words) {
       if (Words.hasOwnProperty(key)) {
         // evaluate the rest
         for (var j = 0; j < 30; j++) {
@@ -88,6 +107,7 @@ function displayContents(contents) {
     for (var j = 0; j < mostUsed.length; j++) {
       if (mostUsed[j][0] == str4Pic[0]) {
         sentPicsIndex[i] = j;
+        sentPicsCount[i] = mostUsed[j][1];
         break;
       }
     }
@@ -98,6 +118,7 @@ function displayContents(contents) {
     for (var j = 0; j < mostUsed.length; j++) {
       if (mostUsed[j][0] == "_<audio") {
         sentAudioIndex[i] = j;
+        sentAudioCount[i] = mostUsed[j][1];
         break;
       }
     }
@@ -132,7 +153,6 @@ function displayContents(contents) {
     for (var j = 0; j < 30; j++) {
       mostUsedHTML = mostUsedHTML + "<p>" + mostUsed[j][0].substring(1) +" - "+ Math.round(mostUsed[j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
     }
-
     var btn = "<button type='button' class='btn' data-toggle='collapse' data-target='#mostUsed"+i+"''>" +
               "<i class='fas fa-chevron-down'></i></button>";
 
@@ -141,14 +161,15 @@ function displayContents(contents) {
     div.innerHTML = "<h4>" + contents[i].name + "</h4>" +
                     "<p> Messages sent: <b>" + messagesCount + "</b></p>" +
                     "<p> Words per Message: <b>" + wordsPerMessage[i][0] + "</b></p>" +
-                    "<p> Pictures sent: " + mostUsed[sentPicsIndex[i]][1] + "</p>" +
+                    "<p> Pictures sent: " + sentPicsCount[i] + "</p>" +
+                    "<p> Audio sent:" + sentAudioCount[i] + "</p>" +
                     "<p>"+ btn + "<b> Most used words:</b></p>"+
                     "<div id='mostUsed"+i+"' class='collapse in'>" + mostUsedHTML + "</div>";
     document.getElementById('users').appendChild(div);
 
   }
 
-  // words bar Graph
+  // TODO:words bar Graph
 /*
   for (var i = 0; i < 30; i++) {
     barData = mostUsed[i][0];
@@ -208,51 +229,41 @@ function displayContents(contents) {
       });
 */
 
-  // factors ------------------------------------------------------
+// factors ------------------------------------------------------
+  // find who writes more
+  if (contents[0].message.length > contents[1].message.length) {
+    var n0 = 0;
+    var n1 = 1;
+  } else {
+    var n0 = 1;
+    var n1 = 0;
+  }
+  // calculate factors
+  var factorF = Math.round((contents[n0].message.length/contents[n1].message.length)*100)/100;
+  var wpmF = Math.round(wordsPerMessage[n0][0]/wordsPerMessage[n1][0]*100)/100;
+  var wpm = "And " + contents[n0].name + " messages contain <b>" + wpmF + "</b> times the words of " +contents[n1].name + " messages!</b>";
+  var percent = Math.round((wpmF)*factorF*100);
+  if (percent >= 1) {
+    percent = percent.toString().substring(1,3)  + "</b>% more!";
+  } else {
+    percent = percent  + "</b>% less!";
+  }
 
-    if (contents[0].message.length > contents[1].message.length) {
-      var factorF = Math.round((contents[0].message.length/contents[1].message.length)*100)/100;
-      var wpmF = Math.round(wordsPerMessage[0][0]/wordsPerMessage[1][0]*100)/100;
-      var wpm = "And " + contents[0].name + " messages contain <b>" + wpmF + "</b> times the words of " +contents[1].name + " messages!</b>";
-      var n = 0;
-    } else {
-      var factorF = Math.round((contents[1].message.length/contents[0].message.length)*100)/100;
-      var wpmF = Math.round(wordsPerMessage[1][0]/wordsPerMessage[0][0]*100)/100;
-      var wpm = "And " + contents[1].name + " messages contain <b>" + wpmF + "</b> times the words of " +contents[0].name + " messages!</b>";
-      var n = 1;
-    }
-    var factor = contents[n].name + " writes <b>" + factorF + "</b> times more messages!";
+  // add as html
+  var div = document.createElement('div');
+  div.className = 'mb-0';
+  div.innerHTML = "<p>" + contents[n0].name + " writes <b>" + factorF + "</b> times more messages!" + "</p>" +
+                  "<p>" + wpm + "</p>" +
+                  "<p>" + "Overall " + contents[n0].name +" communicates <b>" + percent + "</p>";
+  document.getElementById('usersRows').appendChild(div);
 
-    var percent = Math.round((wpmF)*factorF*100);
-    if (percent >= 1) {
-      percent = percent.toString().substring(1,3)  + "</b>% more!";
-    } else {
-      percent = percent  + "</b>% less!";
-    }
-
-    var total = "Overall " + contents[n].name +" communicates <b>" + percent;
-
-    var div = document.createElement('div');
-    div.className = 'mb-0';
-    div.innerHTML = "<p>" + factor + "</p>" +
-                    "<p>" + wpm + "</p>" +
-                    "<p>" + total + "</p>";
-    document.getElementById('usersRows').appendChild(div);
-
-  // Messages per Day Radar -----------------------------------------
-    var dayCount = [getMessagesPerDay(contents[0].date), getMessagesPerDay(contents[1].date)];
-
-    var dataTest= getMessagesPerDay(contents[0].date);
-
-    var a = 2000;
-    var b = parseInt(dayCount[0][1]);
-    console.log([parseInt(dayCount[0][0]),parseInt(dayCount[0][1]),parseInt(dayCount[0][2]),parseInt(dayCount[0][3]),parseInt(dayCount[0][4]),parseInt(dayCount[0][5]),parseInt(dayCount[0][6])]);
-
-    new Chart(
+// Messages per Day Radar -----------------------------------------
+  var dayCount = [getMessagesPerDay(contents[0].date), getMessagesPerDay(contents[1].date)];
+  new Chart(
         document.getElementById("dayRadar"),
         {
         type:"radar",
-        data:{labels:[ ["Monday", ""],"Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        data:{labels:[ ["Sunday", ""],"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
         datasets:[
           {label:contents[0].name,
           data:dayCount[0],
@@ -292,20 +303,20 @@ function displayContents(contents) {
           }
         });
 
-  // Create chronologicalGraph aka Messages per day
-    // DATA
-    // returns struct "date count indexStart"
-    messageCount = [countMessages(contents[0].date), countMessages(contents[1].date)];
-    datesFormated = [formatDates(messageCount[0][0].date), formatDates(messageCount[1][0].date)];
-    // returns 2DArray [0][0] are the dates and [1][0] and [1][1] the counts
-    formatedData = formatAll(messageCount, datesFormated);
-    // GRAPH
+// chronological Graph
 
-    // BUG: formatedData[0][1][0] not in ISO format!!
-    var ctx = document.getElementById('chronologicalGraph').getContext('2d');
-    ctx.canvas.width = 1400;
-    ctx.canvas.height = 500;
-    var cfg = {
+  // returns struct "date count indexStart"
+  messageCount = [countMessages(contents[0].date), countMessages(contents[1].date)];
+  datesFormated = [formatDates(messageCount[0][0].date), formatDates(messageCount[1][0].date)];
+
+  // returns 2DArray [0][0] are the dates and [1][0] and [1][1] the counts
+  // BUG: formatedData[0][1][0] not in ISO format!!
+  formatedData = formatAll(messageCount, datesFormated);
+
+  var ctx = document.getElementById('chronologicalGraph').getContext('2d');
+  ctx.canvas.width = 1400;
+  ctx.canvas.height = 500;
+  var cfg = {
       type: 'line',
       data: {
       labels: formatedData[0][0],
@@ -318,12 +329,12 @@ function displayContents(contents) {
         pointRadius: 0,
         lineTension: 0,
         borderWidth: 1,
-        "pointHoverRadius": 10,
-        "backgroundColor":"rgba(20, 168, 204, 0.2)",
-        "borderColor":"rgb(20, 168, 204)",
-        "pointBackgroundColor":"rgb(20, 168, 204)",
-        "pointBorderColor":"#fff","pointHoverBackgroundColor":"#fff",
-        "pointHoverBorderColor":"rgb(20, 168, 204)"},
+        pointHoverRadius: 10,
+        backgroundColor:"rgba(20, 168, 204, 0.2)",
+        borderColor:"rgb(20, 168, 204)",
+        pointBackgroundColor:"rgb(20, 168, 204)",
+        pointBorderColor:"#fff","pointHoverBackgroundColor":"#fff",
+        pointHoverBorderColor:"rgb(20, 168, 204)"},
         {
         label: contents[1].name,
         data: formatedData[0][1][1],
@@ -333,13 +344,13 @@ function displayContents(contents) {
         pointRadius: 0,
         lineTension: 0,
         borderWidth: 1,
-        "pointHoverRadius": 10,
-        "backgroundColor":"rgba(255, 72, 64, 0.2)",
-        "borderColor":"rgb(255, 72, 64)",
-        "pointBackgroundColor":"rgb(255, 72, 64)",
-        "pointBorderColor":"#fff",
-        "pointHoverBackgroundColor":"#fff",
-        "pointHoverBorderColor":"rgb(255, 72, 64)"}]
+        pointHoverRadius: 10,
+        backgroundColor:"rgba(255, 72, 64, 0.2)",
+        borderColor:"rgb(255, 72, 64)",
+        pointBackgroundColor:"rgb(255, 72, 64)",
+        pointBorderColor:"#fff",
+        pointHoverBackgroundColor:"#fff",
+        pointHoverBorderColor:"rgb(255, 72, 64)"}]
     },
         options: {
       scales: {
@@ -363,17 +374,12 @@ function displayContents(contents) {
       }
     }
   };
-      var chart = new Chart(ctx, cfg);
+  var chart = new Chart(ctx, cfg);
 
   // show chat of clicked day ------------------------------------------------
 
-
 }
 
-
-// add file listener for chat file
-document.getElementById('file-input')
-  .addEventListener('change', readSingleFile, false);
 
 // struct factory
 // https://stackoverflow.com/questions/502366/structs-in-javascript
@@ -571,7 +577,6 @@ function formatAll(data, datesF) {
       //Sun May 18 2014 00:00:00 GMT+0200 (CEST)
       dates[j] = moment(dates[j]).format('D MMM YY');
     }
-    console.log(dates);
     /*
     console.log("---DATES---");
     console.log(dates);
@@ -690,10 +695,6 @@ function getWordCount(messages) {
 
 // 30 most used emoji per person
 
-
-// count media
-// TAG <‎Bild weggelassen> in GERMAN
-// TAG
 
 // ---- ---- ---- TOTAL STATS
 
