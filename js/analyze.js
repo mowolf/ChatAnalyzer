@@ -70,10 +70,11 @@ function displayContents(contents) {
 
 // User specific  ------------------------------------------------
   var wordsPerMessage = [];
+  var messagesCount = [0,0];
   for (var i = 0; i < 2; i++) {
   // message Count ----------------------------------------
-  var messagesCount = "0";
-  messagesCount = contents[i].message.length;
+
+  messagesCount[i] = contents[i].message.length;
 
   // Words per message ------------------------------------
   // returns [avergeWordsPerMessage,tolatWords];
@@ -244,18 +245,12 @@ function displayContents(contents) {
   var wpm = "And " + contents[n0].name + " messages contain <b>" + wpmF + "</b> times the words of " +contents[n1].name + " messages!</b>";
   var percent = Math.round((wpmF)*factorF*100);
   if (percent >= 1) {
-    percent = percent.toString().substring(1,3)  + "</b>% more!";
+    percent = percent.toString().substring(1,3)  + "</b>% more words!";
   } else {
-    percent = percent  + "</b>% less!";
+    percent = percent  + "</b>% less words!";
   }
 
-  // add as html
-  var div = document.createElement('div');
-  div.className = 'mb-0';
-  div.innerHTML = "<p>" + contents[n0].name + " writes <b>" + factorF + "</b> times more messages!" + "</p>" +
-                  "<p>" + wpm + "</p>" +
-                  "<p>" + "Overall " + contents[n0].name +" communicates <b>" + percent + "</p>";
-  document.getElementById('usersRows').appendChild(div);
+
 
 // Messages per Day Radar -----------------------------------------
   var dayCount = [getMessagesPerDay(contents[0].date), getMessagesPerDay(contents[1].date)];
@@ -376,6 +371,86 @@ function displayContents(contents) {
   };
   var chart = new Chart(ctx, cfg);
 
+//
+// add as html
+var wordPDA = Math.round((wordsPerMessage[0][1]+wordsPerMessage[1][1])/(formatedData[0][0].length));
+var messPDA = Math.round((messagesCount[0]+messagesCount[1])/(formatedData[0][0].length));
+var div = document.createElement('div');
+div.className = 'mb-0';
+div.innerHTML = "<p> You guys write an average of " +messPDA +" messages with "+ wordPDA + " words per day! </p>" +
+                "<p>" + contents[n0].name + " writes <b>" + factorF + "</b> times more messages!" + "</p>" +
+                "<p>" + wpm + "</p>" +
+                "<p>" + "Overall " + contents[n0].name +" writes <b>" + percent + "</p>";
+document.getElementById('usersRows').appendChild(div);
+//
+
+// chronological words per messages
+
+  //messages[i].trim().split(/\s+/).length;
+/*
+  var ctx = document.getElementById('chronologicalGraph2').getContext('2d');
+  ctx.canvas.width = 1400;
+  ctx.canvas.height = 500;
+  var cfg = {
+      type: 'line',
+      data: {
+      labels: formatedData[0][0],
+      datasets: [{
+        label: contents[0].name,
+        data: formatedData[0][1][0],
+        type: 'line',
+        fill: true,
+        steppedLine: true,
+        pointRadius: 0,
+        lineTension: 0,
+        borderWidth: 1,
+        pointHoverRadius: 10,
+        backgroundColor:"rgba(20, 168, 204, 0.2)",
+        borderColor:"rgb(20, 168, 204)",
+        pointBackgroundColor:"rgb(20, 168, 204)",
+        pointBorderColor:"#fff","pointHoverBackgroundColor":"#fff",
+        pointHoverBorderColor:"rgb(20, 168, 204)"},
+        {
+        label: contents[1].name,
+        data: formatedData[0][1][1],
+        type: 'line',
+        fill: false,
+        steppedLine: true,
+        pointRadius: 0,
+        lineTension: 0,
+        borderWidth: 1,
+        pointHoverRadius: 10,
+        backgroundColor:"rgba(255, 72, 64, 0.2)",
+        borderColor:"rgb(255, 72, 64)",
+        pointBackgroundColor:"rgb(255, 72, 64)",
+        pointBorderColor:"#fff",
+        pointHoverBackgroundColor:"#fff",
+        pointHoverBorderColor:"rgb(255, 72, 64)"}]
+    },
+        options: {
+      scales: {
+        xAxes: [{
+          type: 'time',
+          distribution: 'linear',
+          displayFormats: {
+            month:	'MMM YYYY'
+          },
+          time: {
+            min: '03 03 2014'
+          },
+          unit: 'month'
+        }],
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Number Of Messages'
+          }
+        }]
+      }
+    }
+  };
+  var chart = new Chart(ctx, cfg);
+*/
   // show chat of clicked day ------------------------------------------------
 
 }
