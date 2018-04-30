@@ -101,10 +101,14 @@ function displayContents(contents) {
   mostUsed = [["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
                     ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
                     ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],];
+  var size = 0;
+  for (var key in Words) {
+    if (Words.hasOwnProperty(key)) size++;
+  }
   for (var key in Words) {
       if (Words.hasOwnProperty(key)) {
         // evaluate the rest
-        for (var j = 0; j < 30; j++) {
+        for (var j = 0; j < size; j++) {
           if (Words[key] > mostUsed[j][1]){
             mostUsed.splice( j, 0, [key, Words[key]]);
             break;
@@ -117,11 +121,11 @@ function displayContents(contents) {
     for (var j = 0; j < mostUsed.length; j++) {
       if (mostUsed[j][0] == str4Pic[0]) {
         sentPicsIndex[i] = j;
-        console.log();
         sentPicsCount[i] = mostUsed[j][1];
         break;
       }
     }
+    console.log(mostUsed);
     // remove it from the array
     mostUsed.splice(sentPicsIndex[i], 1);
 
