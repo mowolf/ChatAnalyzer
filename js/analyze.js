@@ -652,6 +652,12 @@ function createArray(contents) {
       t1 = 2;
     }
 
+    if (isNaN(testString.substring(s1,s1+2))) {
+      l1 = 1;
+    } else {
+      l1 = 2;
+    }
+
     if ( ((s1b) == (testString.substring(0,s1) == "["))  && // sb1 false == no [ -> true ; sb1 true == [ --> true
        (!isNaN(testString.substring(s1,s1+l1))) &&        // check if after the sb1 numbers follow
        (!isNaN(testString.substring(s1+l1+1,s1+l1+1+l2)))  && // check for second numbers
@@ -745,6 +751,11 @@ function findNames(lineArray) {
       t1 = 1;
     } else {
       t1 = 2;
+    }
+    if (isNaN(testString.substring(s1,s1+2))) {
+      l1 = 1;
+    } else {
+      l1 = 2;
     }
 
     firstIndex = s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3;
