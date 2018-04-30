@@ -147,7 +147,6 @@ function displayContents(contents) {
 
 
     // Most used emojies
-
     // HTML CONSTRUCTION ------------------------------------
     var mostUsedHTML ="";
     //console.log(wordsPerMessage[i][1]);
@@ -157,13 +156,18 @@ function displayContents(contents) {
     var btn = "<button type='button' class='btn' data-toggle='collapse' data-target='#mostUsed"+i+"''>" +
               "<i class='fas fa-chevron-down'></i></button>";
 
+
+    // clear data from previous analyzations
+    if (i == 0) {
+      document.getElementById('users').innerHTML = "";
+    }
     var div = document.createElement('div');
     div.className = 'col-sm';
     div.innerHTML = "<h4>" + contents[i].name + "</h4>" +
-                    "<p> Messages sent: <b>" + messagesCount + "</b></p>" +
+                    "<p> Messages sent: <b>" + messagesCount[i] + "</b></p>" +
                     "<p> Words per Message: <b>" + wordsPerMessage[i][0] + "</b></p>" +
-                    "<p> Pictures sent: " + sentPicsCount[i] + "</p>" +
-                    "<p> Audio sent:" + sentAudioCount[i] + "</p>" +
+                    "<p> Pictures sent: <b>" + sentPicsCount[i] + "</b></p>" +
+                    //"<p> Audio sent:" + sentAudioCount[i] + "</p>" +
                     "<p>"+ btn + "<b> Most used words:</b></p>"+
                     "<div id='mostUsed"+i+"' class='collapse in'>" + mostUsedHTML + "</div>";
     document.getElementById('users').appendChild(div);
@@ -375,6 +379,11 @@ function displayContents(contents) {
 // add as html
 var wordPDA = Math.round((wordsPerMessage[0][1]+wordsPerMessage[1][1])/(formatedData[0][0].length));
 var messPDA = Math.round((messagesCount[0]+messagesCount[1])/(formatedData[0][0].length));
+
+// clear old data from previous analyzations
+document.getElementById('usersRows').innerHTML = "";
+
+
 var div = document.createElement('div');
 div.className = 'mb-0';
 div.innerHTML = "<p> You guys write an average of " +messPDA +" messages with "+ wordPDA + " words per day! </p>" +
@@ -481,9 +490,157 @@ function createArray(contents) {
   indexArray = [];
   delArray = [];
 
+content = contents;
+  // --- support other exportFormats
+
+if (content.substring(0,1) == "[") {
+    s1 = 1;
+    s1b = true;
+  } else {
+    s1 = 0;
+    s1b = false;
+  }
+
+  // CHECK DD OR D --
+  if (!isNaN(content.substring(s1,s1+2))) {
+    // Is DD or MM
+    l1 = 2;
+  } else if (!isNaN(content.substring(s1,s1+1))){
+    // D or M
+    l1 = 1;
+  } else {
+    // console.error();
+    console.error("Data Format not supported. Error day");
+    return;
+  }
+
+  // CHECK MM or M --
+  if (!isNaN(content.substring(s1+l1+1,s1+l1+1+2))) {
+    // Is MM or DD
+    l2 = 2;
+  } else if (!isNaN(content.substring(s1+l1+1,s1+l1+1+1))){
+    // M or D
+    l2 = 1;
+  } else {
+    // console.error();
+    console.error("Data Format not supported. Error Month");
+    return;
+  }
+  // CHECK YYY or YY --
+  if (!isNaN(content.substring(s1+l1+1+l2+1,s1+l1+1+l2+1+4))) {
+    // Is YYYY
+    l3 = 4;
+  } else if (!isNaN(content.substring(s1+l1+1+l2+1,s1+l1+1+l2+1+2))){
+    // M or D
+    l3 = 2;
+  } else {
+    // console.error();
+    console.error("Data Format not supported. Error Year");
+    return;
+  }
+
+  // Seperator 2
+  console.log("testString");
+
+  for (var n = 1; n < 5; n++) {
+    if ( (!isNaN(content.substring(s1+l1+1+l2+1+l3+n,s1+l1+1+l2+1+l3+n+1))) && (content.substring(s1+l1+1+l2+1+l3+n,s1+l1+1+l2+1+l3+n+1) != " ") ){
+      // Is check seperator 2 and return how many characters it has
+      s2 = n;
+      break;
+    }
+  }
+
+  // TIME ---
+  // t1
+  if (!isNaN(content.substring(s1+l1+1+l2+1+l3+s2,s1+l1+1+l2+1+l3+s2+2))) {
+    // HH
+    t1 = 2
+  } else if (!isNaN(content.substring(s1+l1+1+l2+1+l3+s2,s1+l1+1+l2+1+l3+s2+1))) {
+    // M or D
+    t1 = 1;
+  } else {
+    // console.error();
+    console.error("Data Format not supported. Error t1");
+    return;
+  }
+  // t2
+  if (!isNaN(content.substring(s1+l1+1+l2+1+l3+s2+t1+1,s1+l1+1+l2+1+l3+s2+t1+1+2))) {
+    // HH
+    t2 = 2
+  } else if (!isNaN(content.substring(s1+l1+1+l2+1+l3+s2+t1+1,s1+l1+1+l2+1+l3+s2+t1+1+1))) {
+    // M or D
+    t2 = 1;
+  } else {
+    // console.error();
+    console.error("Data Format not supported. Error t2");
+    return;
+  }
+  // t3
+  if (!isNaN(content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+2))) {
+    // SS
+    t3 = 2;
+  } else if (!isNaN(content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+1))) {
+    // S
+    t3 = 1;
+  } else {
+    t3 = -1;
+  }
+  // t4 12 h modifier
+  if ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+2,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+3)) == ".") {
+    // p. m. a. m.
+    t4 = 6;
+    t4String = [" p. m."," a. m."];
+  } else if ( ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+1,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+2)) == "A") ||
+            ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+1,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+2)) == "P") ) {
+    t4 = 3;
+    t4String = [" PM"," AM"];
+  } else {
+    t4 = 0;
+    t4toString = "";
+  }
+
+  // seperator 3 ---
+
+  if ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+3)) == " - ") {
+    // SS
+    sep3 = 3;
+    sep3Char = " - ";
+  } else if ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+2)) == "] ") {
+    // S
+    sep3 = 2;
+    sep3Char = "] ";
+  } else if ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+2)) == ": ") {
+    sep3 = 2;
+    sep3Char = ": ";
+  }
+  sep4Char = ": ";
+
+// Message can be in these formats: https://docs.google.com/spreadsheets/d/1mZCE_tFelvqmLh0vIt7vMjU1OYB0etuhwXRl3Fzv6k8/edit#gid=0
+// variables give the index ralative to the start of the message
+// s1 +	l1 +	1+	l2 +	1+	l3+	s2+	t1+1+t2+1+t3+t4+sep3+NAME+sep4+text
+// TODO: regex https://www.debuggex.com/r/BV2K4Bce5liO7mtH
+
+for (var i = 0; i < contents.length; i++) {
+  //  max character length of start:  ~30
+  testString = contents.substring(i, i+30 );
+
+  //
+  if ( ((s1b) == (testString.substring(0,s1) == "["))  && // sb1 false == no [ -> true ; sb1 true == [ --> true
+       (!isNaN(testString.substring(s1,s1+l1))) &&        // check if after the sb1 numbers follow
+       (!isNaN(testString.substring(s1+l1+1,s1+l1+1+l2)))  && // check for second numbers
+       ((testString.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3) == sep3Char)) // check if last character is sep3 char
+     ) {
+       // save index
+       indexArray.push(i);
+     }
+}
+
+// mowolfs whatsapp format:
+/*
   for (var i = 0; i < contents.length; i++) {
-    // search for [00.00.00, 00:00:00] and note index of "["
-    testString = contents.substring(i, i+20 );
+    //  max character length of start:  ~30
+    // e.g. search for [00.00.00, 00:00:00] and note index of "["
+    testString = contents.substring(i, i+30 );
 
     if ( (testString.substring(0,1) == "[")  &&
          (!isNaN(testString.substring(1,3))) &&
@@ -494,6 +651,8 @@ function createArray(contents) {
          indexArray.push(i);
        }
   }
+*/
+
   // split messsages
 
 
