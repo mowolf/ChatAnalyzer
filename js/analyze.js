@@ -28,6 +28,13 @@ function readSingleFile(e) {
     // checks if group chat
     if (structArray.length > 2) {
       // groups not supported yet!
+
+      var div = document.createElement('div');
+      div.className = 'col-sm';
+      div.innerHTML = "<p>If you get this error even though this is no group chat search in your .txt file and replace this occurence:</p>" +
+                        structArray[2].name;
+      document.getElementById('groups').appendChild(div);
+
       var res = document.getElementById("groups");
       res.style.display = "block";
       return;
@@ -82,14 +89,16 @@ function displayContents(contents) {
 
   // Most used words --------------------------------------
   var Words = getWordCount(contents[i].message);
-  var str4Pic = ["_<‎bild","_<picture"];
+  // ATTENTION: These strings have some weird character between "<" and "bild" !!!!
+  // TODO: BUG: Support more img languages
+  var str4Pic = ["_<‎bild","_<‎picture"];
   var sentPicsIndex = [-1,-1];
   var sentAudioIndex = [-1,-1];
   var sentAudioCount = [0,0];
   var sentPicsCount = [0,0];
 
   // create &sort most Used array
-  var mostUsed = [["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
+  mostUsed = [["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
                     ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
                     ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],];
   for (var key in Words) {
@@ -108,6 +117,7 @@ function displayContents(contents) {
     for (var j = 0; j < mostUsed.length; j++) {
       if (mostUsed[j][0] == str4Pic[0]) {
         sentPicsIndex[i] = j;
+        console.log();
         sentPicsCount[i] = mostUsed[j][1];
         break;
       }
@@ -117,7 +127,7 @@ function displayContents(contents) {
 
     // --  evaluate how many audio files were sent
     for (var j = 0; j < mostUsed.length; j++) {
-      if (mostUsed[j][0] == "_<audio") {
+      if (mostUsed[j][0] == "_<‎audio") {
         sentAudioIndex[i] = j;
         sentAudioCount[i] = mostUsed[j][1];
         break;
@@ -150,7 +160,13 @@ function displayContents(contents) {
     // HTML CONSTRUCTION ------------------------------------
     var mostUsedHTML ="";
     //console.log(wordsPerMessage[i][1]);
-    for (var j = 0; j < 30; j++) {
+    if (mostUsed.length > 29) {
+      max = 30;
+    } else {
+      max = mostUsed.length;
+    }
+
+    for (var j = 0; j < max; j++) {
       mostUsedHTML = mostUsedHTML + "<p>" + mostUsed[j][0].substring(1) +" - "+ Math.round(mostUsed[j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
     }
     var btn = "<button type='button' class='btn' data-toggle='collapse' data-target='#mostUsed"+i+"''>" +
@@ -386,7 +402,7 @@ document.getElementById('usersRows').innerHTML = "";
 
 var div = document.createElement('div');
 div.className = 'mb-0';
-div.innerHTML = "<p> You guys write an average of " +messPDA +" messages with "+ wordPDA + " words per day! </p>" +
+div.innerHTML = "<p> You guys write an average of " +messPDA +" messages per day. That's "+ wordPDA + " words per day! </p>" +
                 "<p>" + contents[n0].name + " writes <b>" + factorF + "</b> times more messages!" + "</p>" +
                 "<p>" + wpm + "</p>" +
                 "<p>" + "Overall " + contents[n0].name +" writes <b>" + percent + "</p>";
@@ -490,10 +506,10 @@ function createArray(contents) {
   indexArray = [];
   delArray = [];
 
-content = contents;
+  content = contents;
   // --- support other exportFormats
 
-if (content.substring(0,1) == "[") {
+  if (content.substring(0,1) == "[") {
     s1 = 1;
     s1b = true;
   } else {
@@ -551,7 +567,7 @@ if (content.substring(0,1) == "[") {
   }
 
   // TIME ---
-  // t1
+  // TODO: 12h support
   if (!isNaN(content.substring(s1+l1+1+l2+1+l3+s2,s1+l1+1+l2+1+l3+s2+2))) {
     // HH
     t1 = 2
@@ -563,6 +579,7 @@ if (content.substring(0,1) == "[") {
     console.error("Data Format not supported. Error t1");
     return;
   }
+
   // t2
   if (!isNaN(content.substring(s1+l1+1+l2+1+l3+s2+t1+1,s1+l1+1+l2+1+l3+s2+t1+1+2))) {
     // HH
@@ -600,32 +617,38 @@ if (content.substring(0,1) == "[") {
   }
 
   // seperator 3 ---
-
-  if ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+3)) == " - ") {
+  if ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+3)) == " - ") {
     // SS
     sep3 = 3;
     sep3Char = " - ";
-  } else if ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+2)) == "] ") {
+  } else if ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+2)) == "] ") {
     // S
     sep3 = 2;
     sep3Char = "] ";
-  } else if ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+2)) == ": ") {
+  } else if ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+2)) == ": ") {
     sep3 = 2;
     sep3Char = ": ";
   }
   sep4Char = ": ";
+  s4 = 2;
 
-// Message can be in these formats: https://docs.google.com/spreadsheets/d/1mZCE_tFelvqmLh0vIt7vMjU1OYB0etuhwXRl3Fzv6k8/edit#gid=0
-// variables give the index ralative to the start of the message
-// s1 +	l1 +	1+	l2 +	1+	l3+	s2+	t1+1+t2+1+t3+t4+sep3+NAME+sep4+text
-// TODO: regex https://www.debuggex.com/r/BV2K4Bce5liO7mtH
+  // Message can be in these formats: https://docs.google.com/spreadsheets/d/1mZCE_tFelvqmLh0vIt7vMjU1OYB0etuhwXRl3Fzv6k8/edit#gid=0
+  // variables give the index ralative to the start of the message
+  // s1 +	l1 +	1+	l2 +	1+	l3+	s2+	t1+1+t2+1+t3+t4+sep3+NAME+sep4+text
+  // TODO: regex https://www.debuggex.com/r/BV2K4Bce5liO7mtH
 
-for (var i = 0; i < contents.length; i++) {
+  for (var i = 0; i < contents.length; i++) {
   //  max character length of start:  ~30
-  testString = contents.substring(i, i+30 );
+    testString = contents.substring(i, i+30 );
+  // TODO: 12h supported
 
-  //
-  if ( ((s1b) == (testString.substring(0,s1) == "["))  && // sb1 false == no [ -> true ; sb1 true == [ --> true
+    if (isNaN(testString.substring(s1+l1+1+l2+1+l3+s2,s1+l1+1+l2+1+l3+s2+2))) {
+      t1 = 1;
+    } else {
+      t1 = 2;
+    }
+
+    if ( ((s1b) == (testString.substring(0,s1) == "["))  && // sb1 false == no [ -> true ; sb1 true == [ --> true
        (!isNaN(testString.substring(s1,s1+l1))) &&        // check if after the sb1 numbers follow
        (!isNaN(testString.substring(s1+l1+1,s1+l1+1+l2)))  && // check for second numbers
        ((testString.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3) == sep3Char)) // check if last character is sep3 char
@@ -633,33 +656,13 @@ for (var i = 0; i < contents.length; i++) {
        // save index
        indexArray.push(i);
      }
-}
-
-// mowolfs whatsapp format:
-/*
-  for (var i = 0; i < contents.length; i++) {
-    //  max character length of start:  ~30
-    // e.g. search for [00.00.00, 00:00:00] and note index of "["
-    testString = contents.substring(i, i+30 );
-
-    if ( (testString.substring(0,1) == "[")  &&
-         (!isNaN(testString.substring(1,3))) &&
-         (!isNaN(testString.substring( testString.length - 3  , testString.length -1 )))  &&
-         (testString.substring(testString.length - 1) == "]")
-       ) {
-         // save index
-         indexArray.push(i);
-       }
-  }
-*/
+   }
 
   // split messsages
-
-
   for (var i = 0; i < indexArray.length; i++) {
     // fill array
     if (i == indexArray.length - 1) {
-      lineArray[i] = contents.substring(indexArray[i],contents.length-1);
+      lineArray[i] = contents.substring(indexArray[i], contents.length-1);
     } else {
       lineArray[i] = contents.substring(indexArray[i], indexArray[i+1]);
     }
@@ -706,11 +709,11 @@ function createStructs(lineArray) {
 
     // splice messages
     for (j = 0; j < lineArray.length; j++) {
-      if ( lineArray[j].substring(21, 21 + nameLength).match(name) ) {
+      if ( lineArray[j].substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3, s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3 + nameLength).match(name) ) {
 
-        date[a] = lineArray[j].substring(1,9);
-        time[a] = lineArray[j].substring(11, 19);
-        message[a] = lineArray[j].substring(21 + uniqueNames[i].length);
+        date[a] = lineArray[j].substring(s1,s1+l1+1+l2+1+l3);
+        time[a] = lineArray[j].substring(s1+l2+1+l2+1+l3+s2, s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4);
+        message[a] = lineArray[j].substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3+uniqueNames[i].length+s4);
         a++;
       }
     }
@@ -730,12 +733,18 @@ function createStructs(lineArray) {
 function findNames(lineArray) {
   names = [];
   messages = [];
-  firstIndex = 21;
   group = false;
 
   for (var i = 0; i< lineArray.length; i++){
     // second occurence of ":" marks end of NAME
-    var secondIndex = lineArray[i].substring(21, lineArray[i].length - 1).indexOf(": ") + 21;
+    if (isNaN(lineArray[i].substring(s1+l1+1+l2+1+l3+s2,s1+l1+1+l2+1+l3+s2+2))) {
+      t1 = 1;
+    } else {
+      t1 = 2;
+    }
+
+    firstIndex = s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3;
+    secondIndex = lineArray[i].substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3).indexOf(": ") + s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3;
 
     // log
     //console.log( lineArray[i].substring(21, lineArray[i].length - 1) );
@@ -832,7 +841,6 @@ function formatAll(data, datesF) {
   return formated;
 }
 
-
 // ----- ---- ---- PERSONAL STATS -------------------- //
 
 // activity by day of week
@@ -928,7 +936,6 @@ function getWordCount(messages) {
 }
 
 // 30 most used emoji per person
-
 
 // ---- ---- ---- TOTAL STATS
 
