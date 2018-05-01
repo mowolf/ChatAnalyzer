@@ -75,7 +75,7 @@ function displayContents(contents) {
 
   // contents is an object: name, message, date, time
 
-// User specific  ------------------------------------------------
+  // User specific  ------------------------------------------------
   var wordsPerMessage = [];
   var messagesCount = [0,0];
   for (var i = 0; i < 2; i++) {
@@ -253,8 +253,7 @@ function displayContents(contents) {
       }
       });
 */
-
-// factors ------------------------------------------------------
+  // factors ------------------------------------------------------
   // find who writes more
   if (contents[0].message.length > contents[1].message.length) {
     var n0 = 0;
@@ -273,7 +272,6 @@ function displayContents(contents) {
   } else {
     percent = percent  + "</b>% less words!";
   }
-
 
 
 // Messages per Day Radar -----------------------------------------
@@ -481,7 +479,6 @@ document.getElementById('usersRows').appendChild(div);
   var chart = new Chart(ctx, cfg);
 */
   // show chat of clicked day ------------------------------------------------
-
 }
 
 
@@ -658,6 +655,7 @@ function createArray(contents) {
       l1 = 2;
     }
 
+    /* OLD CONSTRUCT
     if ( ((s1b) == (testString.substring(0,s1) == "["))  && // sb1 false == no [ -> true ; sb1 true == [ --> true
        (!isNaN(testString.substring(s1,s1+l1))) &&        // check if after the sb1 numbers follow
        (!isNaN(testString.substring(s1+l1+1,s1+l1+1+l2)))  && // check for second numbers
@@ -666,21 +664,37 @@ function createArray(contents) {
        // save index
        indexArray.push(i);
      }
+     */
+
    }
 
-  // split messsages
-  for (var i = 0; i < indexArray.length; i++) {
-    // fill array
-    if (i == indexArray.length - 1) {
-      lineArray[i] = contents.substring(indexArray[i], contents.length-1);
-    } else {
-      lineArray[i] = contents.substring(indexArray[i], indexArray[i+1]);
+
+   // TODO: REGEX (\[?)((\d{1,4}(\-|\/|\.){1}){2}\d{2,4})((\sum\s|\s)|\,\s|\.\s){1}((\d{1,2}\:)\d{2}(:\d{2})?)(\s(A|P)?M|\s(a|p)?\.\s\m\.)?(\]\s|\s\-\s|\:)(.)([^:\n])(.*)
+   // https://www.debuggex.com/r/T-e1737oi_nVWgf4
+   // This regex is used to find the start index of every message
+   var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\sum\\s|\\s)|\\,\\s|\\.\\s){1}((\\d{1,2}\\:)\\d{2}(:\\d{2})?)(\\s(A|P)?M|\\s(a|p)?\\.\\s\\m\\.)?(\\]\\s|\\s\\-\\s|\\:)([^:\\n-.]*)","g");
+   //var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\sum\\s|\\s)|\\,\\s|\\.\\s){1}((\\d{1,2}\\:)\\d{2}(:\\d{2})?)(\\s(A|P)?M|\\s(a|p)?\\.\\s\\m\\.)?(\\]\\s|\\s\\-\\s|\\:)(.)([^:\\n])(.*)","g");
+
+   var i = 0
+   while ((match = re.exec(contents)) != null) {
+     //console.log("match found at " + match.index);
+     indexArray[i] = match.index;
+     i++;
+   }
+
+   // split messsages
+   for (var i = 0; i < indexArray.length; i++) {
+     // fill array
+      if (i == indexArray.length - 1) {
+        lineArray[i] = contents.substring(indexArray[i], contents.length-1);
+      } else {
+        lineArray[i] = contents.substring(indexArray[i], indexArray[i+1]);
+      }
     }
-  }
 
   // remove any lines without ":"
   // e.g. announcments when people get added to groups
-  a = 0;
+  var a = 0;
   for (var i = 0; i < lineArray.length; i++)  {
     if (lineArray[i].substring(20,lineArray[i].length).indexOf(":") < 0) {
       // no ":" found. Delete this line
@@ -693,11 +707,13 @@ function createArray(contents) {
   for (var i = 0 ; i < a; i++) {
     lineArray.splice(delArray[i]-i,1)
   }
-
+  // This array does contain now one message per line including the complete format
   return lineArray;
 }
 
-// transform lineArray into structs
+
+
+// transform lineArray into structs --------
 function createStructs(lineArray) {
 
   var uniqueNames = findNames(lineArray);
