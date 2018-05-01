@@ -6,6 +6,7 @@ document.getElementById('file-input')
 function readSingleFile(e) {
 
   var file = e.target.files[0];
+
   if ((!file) || (file.type != "text/plain")) {
     console.log("ERROR! No txt file selected!");
     var er = document.getElementById("error");
@@ -15,16 +16,19 @@ function readSingleFile(e) {
     res.style.display = "none";
     return;
   }
-  console.log(file);
+
+  // Show loading
+  var d = document.getElementById("loading");
+  d.style.display = "block";
+
   var reader = new FileReader();
 
   // execude on load of file
   reader.onload = function(e) {
-
+    //
     var contents = e.target.result;
     // get data in right format
     var structArray = createStructs(createArray(contents));
-
     // checks if group chat
     if (structArray.length > 2) {
       // groups not supported yet!
@@ -41,10 +45,6 @@ function readSingleFile(e) {
     } else {
       // normal chat
       // display Contents
-      // Show loading
-      var d = document.getElementById("loading");
-      d.style.display = "block";
-      // calculate
       displayContents(structArray);
       // Hide Loading
       var d = document.getElementById("loading");
@@ -72,6 +72,7 @@ function displayContents(contents) {
 
   // TODO: add group support (make carousell for groups)
   // TODO: add words per messages and plot the change over time
+  // TODO: Make sure all variables are resetted when choosing the next file! -> write initalizer
 
   // contents is an object: name, message, date, time
 
@@ -89,8 +90,8 @@ function displayContents(contents) {
 
   // Most used words --------------------------------------
   var Words = getWordCount(contents[i].message);
-  // ATTENTION: These strings have some weird character between "<" and "bild" !!!!
-  // TODO: BUG: Support more img languages
+  // ATTENTION: These strings have some weird invisible space character between "<" and "bild" !!!!
+  // TODO: BUG: Support all img variants
   var str4Pic = ["_<‎bild","_<‎picture"];
   var sentPicsIndex = [-1,-1];
   var sentAudioIndex = [-1,-1];
@@ -125,7 +126,7 @@ function displayContents(contents) {
         break;
       }
     }
-    console.log(mostUsed);
+    // console.log(mostUsed);
     // remove it from the array
     mostUsed.splice(sentPicsIndex[i], 1);
 
@@ -143,7 +144,7 @@ function displayContents(contents) {
     // renove unwanted words
     // find position of "weggelassen>"
     // TODO: Add other languages
-    var endOfMedia = ["_weggelassen>"]
+    var endOfMedia = ["_weggelassen>"];
 
     for (var j = 0; j < mostUsed.length; j++) {
       if (mostUsed[j][0] == endOfMedia[0]) {
@@ -159,8 +160,8 @@ function displayContents(contents) {
     }
     // filter out most common words
 
-
     // Most used emojies
+
     // HTML CONSTRUCTION ------------------------------------
     var mostUsedHTML ="";
     //console.log(wordsPerMessage[i][1]);
@@ -273,7 +274,6 @@ function displayContents(contents) {
     percent = percent  + "</b>% less words!";
   }
 
-
 // Messages per Day Radar -----------------------------------------
   var dayCount = [getMessagesPerDay(contents[0].date), getMessagesPerDay(contents[1].date)];
   new Chart(
@@ -324,22 +324,94 @@ function displayContents(contents) {
 
   // returns struct "date count indexStart"
   messageCount = [countMessages(contents[0].date), countMessages(contents[1].date)];
-  datesFormated = [formatDates(messageCount[0][0].date), formatDates(messageCount[1][0].date)];
 
-  // returns 2DArray [0][0] are the dates and [1][0] and [1][1] the counts
-  // BUG: formatedData[0][1][0] not in ISO format!!
-  formatedData = formatAll(messageCount, datesFormated);
+  // BUG: not in ISO format!!
+  formatedStruct = addMissingDays(messageCount);
 
+  // better tooltips
+  	Chart.defaults.global.pointHitDetectionRadius = 1;
+
+    var customTooltips = function(tooltip) {
+  			// Tooltip Element
+  			var tooltipEl = document.getElementById('chartjs-tooltip');
+
+  			if (!tooltipEl) {
+  				tooltipEl = document.createElement('div');
+  				tooltipEl.id = 'chartjs-tooltip';
+  				tooltipEl.innerHTML = '<table></table>';
+  				this._chart.canvas.parentNode.appendChild(tooltipEl);
+  			}
+
+  			// Hide if no tooltip
+  			if (tooltip.opacity === 0) {
+  				tooltipEl.style.opacity = 0;
+  				return;
+  			}
+
+  			// Set caret Position
+  			tooltipEl.classList.remove('above', 'below', 'no-transform');
+  			if (tooltip.yAlign) {
+  				tooltipEl.classList.add(tooltip.yAlign);
+  			} else {
+  				tooltipEl.classList.add('no-transform');
+  			}
+
+  			function getBody(bodyItem) {
+  				return bodyItem.lines;
+  			}
+
+  			// Set Text
+  			if (tooltip.body) {
+  				var titleLines = tooltip.title || [];
+  				var bodyLines = tooltip.body.map(getBody);
+
+  				var innerHtml = '<thead>';
+
+  				titleLines.forEach(function(title) {
+  					innerHtml += '<tr><th>' + title.substring(0,12) + '</th></tr>';
+            // the title is the date - we only want to show the day not the time
+  				});
+  				innerHtml += '</thead><tbody>';
+
+  				bodyLines.forEach(function(body, i) {
+  					var colors = tooltip.labelColors[i];
+  					var style = 'background:' + colors.backgroundColor;
+  					style += '; border-color:' + colors.borderColor;
+  					style += '; border-width: 2px';
+  					var span = '<span class="chartjs-tooltip-key" style="' + style + '"></span>';
+  					innerHtml += '<tr><td>' +span + body + '</td></tr>';
+            // body is NAME: Count
+  				});
+  				innerHtml += '</tbody>';
+
+  				var tableRoot = tooltipEl.querySelector('table');
+  				tableRoot.innerHTML = innerHtml;
+  			}
+
+  			var positionY = this._chart.canvas.offsetTop;
+  			var positionX = this._chart.canvas.offsetLeft;
+
+  			// Display, position, and set styles for font
+  			tooltipEl.style.opacity = 1;
+  			tooltipEl.style.left = positionX + tooltip.caretX + 'px';
+  			tooltipEl.style.top = positionY + tooltip.caretY + 'px';
+  			tooltipEl.style.fontFamily = tooltip._bodyFontFamily;
+  			tooltipEl.style.fontSize = tooltip.bodyFontSize + 'px';
+  			tooltipEl.style.fontStyle = tooltip._bodyFontStyle;
+  			tooltipEl.style.padding = tooltip.yPadding + 'px ' + tooltip.xPadding + 'px';
+  		};
+
+  //
   var ctx = document.getElementById('chronologicalGraph').getContext('2d');
   ctx.canvas.width = 1400;
   ctx.canvas.height = 500;
   var cfg = {
       type: 'line',
       data: {
-      labels: formatedData[0][0],
+      labels: formatedStruct[0].date,
       datasets: [{
         label: contents[0].name,
-        data: formatedData[0][1][0],
+        data: formatedStruct[0].count,
         type: 'line',
         fill: true,
         steppedLine: true,
@@ -350,11 +422,12 @@ function displayContents(contents) {
         backgroundColor:"rgba(20, 168, 204, 0.2)",
         borderColor:"rgb(20, 168, 204)",
         pointBackgroundColor:"rgb(20, 168, 204)",
-        pointBorderColor:"#fff","pointHoverBackgroundColor":"#fff",
+        pointBorderColor:"#fff",
+        pointHoverBackgroundColor:"#fff",
         pointHoverBorderColor:"rgb(20, 168, 204)"},
         {
         label: contents[1].name,
-        data: formatedData[0][1][1],
+        data: formatedStruct[1].count,
         type: 'line',
         fill: false,
         steppedLine: true,
@@ -370,33 +443,36 @@ function displayContents(contents) {
         pointHoverBorderColor:"rgb(255, 72, 64)"}]
     },
         options: {
-      scales: {
-        xAxes: [{
-          type: 'time',
-          distribution: 'linear',
-          displayFormats: {
-            month:	'MMM YYYY'
+          scales: {
+            xAxes: [{
+              type: 'time',
+              distribution: 'linear',
+              time: {
+                    unit: 'year'
+              }
+            }],
+            yAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: 'Number Of Messages'
+              }
+            }]
           },
-          time: {
-            min: '03 03 2014'
-          },
-          unit: 'month'
-        }],
-        yAxes: [{
-          scaleLabel: {
-            display: true,
-            labelString: 'Number Of Messages'
-          }
-        }]
-      }
-    }
+          tooltips: {
+						enabled: false,
+						mode: 'index',
+						position: 'nearest',
+						custom: customTooltips
+					}
+        }
   };
+
   var chart = new Chart(ctx, cfg);
 
 //
 // add as html
-var wordPDA = Math.round((wordsPerMessage[0][1]+wordsPerMessage[1][1])/(formatedData[0][0].length));
-var messPDA = Math.round((messagesCount[0]+messagesCount[1])/(formatedData[0][0].length));
+var wordPDA = Math.round((wordsPerMessage[0][1]+wordsPerMessage[1][1])/(formatedStruct[0].date.length));
+var messPDA = Math.round((messagesCount[0]+messagesCount[1])/(formatedStruct[0].date.length));
 
 // clear old data from previous analyzations
 document.getElementById('usersRows').innerHTML = "";
@@ -557,7 +633,6 @@ function createArray(contents) {
   }
 
   // Seperator 2
-  console.log("testString");
 
   for (var n = 1; n < 5; n++) {
     if ( (!isNaN(content.substring(s1+l1+1+l2+1+l3+n,s1+l1+1+l2+1+l3+n+1))) && (content.substring(s1+l1+1+l2+1+l3+n,s1+l1+1+l2+1+l3+n+1) != " ") ){
@@ -568,7 +643,8 @@ function createArray(contents) {
   }
 
   // TIME ---
-  // TODO: 12h support
+  // THIS IS NOT REPRESENTATIVE as the first might be 12:00 am and the next is 1:00 pm
+  // TODO: get rid of this part
   if (!isNaN(content.substring(s1+l1+1+l2+1+l3+s2,s1+l1+1+l2+1+l3+s2+2))) {
     // HH
     t1 = 2
@@ -580,6 +656,7 @@ function createArray(contents) {
     console.error("Data Format not supported. Error t1");
     return;
   }
+  // ---
 
   // t2
   if (!isNaN(content.substring(s1+l1+1+l2+1+l3+s2+t1+1,s1+l1+1+l2+1+l3+s2+t1+1+2))) {
@@ -608,8 +685,8 @@ function createArray(contents) {
     // p. m. a. m.
     t4 = 6;
     t4String = [" p. m."," a. m."];
-  } else if ( ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+1,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+2)) == "A") ||
-            ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+1,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+2)) == "P") ) {
+  } else if ( ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+1,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+2)).toLowerCase() == "a") ||
+            ((content.substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+1,s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+2)).toLowerCase() == "p") ) {
     t4 = 3;
     t4String = [" PM"," AM"];
   } else {
@@ -633,15 +710,10 @@ function createArray(contents) {
   sep4Char = ": ";
   s4 = 2;
 
-  // Message can be in these formats: https://docs.google.com/spreadsheets/d/1mZCE_tFelvqmLh0vIt7vMjU1OYB0etuhwXRl3Fzv6k8/edit#gid=0
-  // variables give the index ralative to the start of the message
-  // s1 +	l1 +	1+	l2 +	1+	l3+	s2+	t1+1+t2+1+t3+t4+sep3+NAME+sep4+text
-  // TODO: regex https://www.debuggex.com/r/BV2K4Bce5liO7mtH
-
+  /*OLD CONSTRUCT
   for (var i = 0; i < contents.length; i++) {
   //  max character length of start:  ~30
     testString = contents.substring(i, i+30 );
-  // TODO: 12h supported
 
     if (isNaN(testString.substring(s1+l1+1+l2+1+l3+s2,s1+l1+1+l2+1+l3+s2+2))) {
       t1 = 1;
@@ -654,8 +726,6 @@ function createArray(contents) {
     } else {
       l1 = 2;
     }
-
-    /* OLD CONSTRUCT
     if ( ((s1b) == (testString.substring(0,s1) == "["))  && // sb1 false == no [ -> true ; sb1 true == [ --> true
        (!isNaN(testString.substring(s1,s1+l1))) &&        // check if after the sb1 numbers follow
        (!isNaN(testString.substring(s1+l1+1,s1+l1+1+l2)))  && // check for second numbers
@@ -664,15 +734,17 @@ function createArray(contents) {
        // save index
        indexArray.push(i);
      }
-     */
-
-   }
 
 
-   // TODO: REGEX (\[?)((\d{1,4}(\-|\/|\.){1}){2}\d{2,4})((\sum\s|\s)|\,\s|\.\s){1}((\d{1,2}\:)\d{2}(:\d{2})?)(\s(A|P)?M|\s(a|p)?\.\s\m\.)?(\]\s|\s\-\s|\:)(.)([^:\n])(.*)
-   // https://www.debuggex.com/r/T-e1737oi_nVWgf4
-   // This regex is used to find the start index of every message
-   var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\sum\\s|\\s)|\\,\\s|\\.\\s){1}((\\d{1,2}\\:)\\d{2}(:\\d{2})?)(\\s(A|P)?M|\\s(a|p)?\\.\\s\\m\\.)?(\\]\\s|\\s\\-\\s|\\:)([^:\\n-.]*)","g");
+   }*/
+
+   // Message can be in these formats: https://docs.google.com/spreadsheets/d/1mZCE_tFelvqmLh0vIt7vMjU1OYB0etuhwXRl3Fzv6k8/edit#gid=0
+   // variables give the index ralative to the start of the message to seperate the data in the next functions
+   // s1 +	l1 +	1+	l2 +	1+	l3+	s2+	t1+1+t2+1+t3+t4+sep3+NAME+sep4+text
+   // REGEX
+   // https://www.debuggex.com/r/4oudOv37eWpW9NMt
+   // This regex is used to find the start index of every message (including special messages)
+   var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\sum\\s|\\s)|\\,\\s|\\.\\s){1}((\\d{1,2}\\:)\\d{2}(:\\d{2})?)(\\s(a|p)?m|\\s(A|P)?M|\\s(a|p)?\\.\\s\\m\\.)?(\\]\\s|\\s\\-\\s|\\:)([^:\\n-.]*)","g");
    //var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\sum\\s|\\s)|\\,\\s|\\.\\s){1}((\\d{1,2}\\:)\\d{2}(:\\d{2})?)(\\s(A|P)?M|\\s(a|p)?\\.\\s\\m\\.)?(\\]\\s|\\s\\-\\s|\\:)(.)([^:\\n])(.*)","g");
 
    var i = 0
@@ -692,8 +764,8 @@ function createArray(contents) {
       }
     }
 
-  // remove any lines without ":"
-  // e.g. announcments when people get added to groups
+  // remove any special messages (e.g. lines without ":")
+  // e.g. announcments when people get added to groups, security change etc
   var a = 0;
   for (var i = 0; i < lineArray.length; i++)  {
     if (lineArray[i].substring(20,lineArray[i].length).indexOf(":") < 0) {
@@ -710,8 +782,6 @@ function createArray(contents) {
   // This array does contain now one message per line including the complete format
   return lineArray;
 }
-
-
 
 // transform lineArray into structs --------
 function createStructs(lineArray) {
@@ -733,12 +803,61 @@ function createStructs(lineArray) {
     // log name that is processed
     //console.log(name);
 
-    // splice messages
-    for (j = 0; j < lineArray.length; j++) {
-      if ( lineArray[j].substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3, s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3 + nameLength).match(name) ) {
+    // note if DD:MM or MM:DD
+    var ddmm = false;
+    for (var j = 0; j < lineArray.length; j++) {
+      if (lineArray[i].substring(s1,s1+l1) > 12) {
+        var ddmm = true;
+        break;
+      }
+    }
 
-        date[a] = lineArray[j].substring(s1,s1+l1+1+l2+1+l3);
-        time[a] = lineArray[j].substring(s1+l2+1+l2+1+l3+s2, s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4);
+    // splice messages
+    for (var j = 0; j < lineArray.length; j++) {
+      if ( lineArray[j].substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3, s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3 + nameLength) == name ) {
+
+        // date to YYYY-MM-DD
+        if (ddmm) {
+          dd = lineArray[j].substring(s1,s1+l1)
+          mm = lineArray[j].substring(s1+l1+1,s1+l1+1+l2);
+        } else {
+          dd = lineArray[j].substring(s1+l1+1,s1+l1+1+l2);
+          mm = lineArray[j].substring(s1,s1+l1);
+        }
+        yyyy = lineArray[j].substring(s1+l1+1+l2+1,s1+l1+1+l2+1+l3);
+
+        if (dd.length == 1) {
+          dd = "0" + dd;
+        }
+        if (mm.length == 1) {
+          mm = "0" + mm;
+        }
+        if (yyyy.length == 2) {
+          yyyy = "20" + yyyy;
+        }
+
+        date[a] = yyyy+"-"+mm+"-"+dd;
+
+        // time to HH:MM:SS
+        hh = lineArray[j].substring(s1+l2+1+l2+1+l3+s2, s1+l1+1+l2+1+l3+s2+t1);
+        mm = lineArray[j].substring(s1+l2+1+l2+1+l3+s2+t1+1, s1+l1+1+l2+1+l3+s2+t1+1+t2);
+        ss = lineArray[j].substring(s1+l2+1+l2+1+l3+s2+t1+1+t2+1, s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3);
+
+        if (hh.length == 1) {
+          hh = "0" + hh;
+        }
+        if (mm.length == 1) {
+          mm = "0" + mm;
+        }
+        if (ss.length == 1) {
+          ss = "0" + ss;
+        }
+        if (ss.length == 0) {
+          ss = "00";
+        }
+        time[a] = hh+":"+mm+":"+ss;
+
+        // message
         message[a] = lineArray[j].substring(s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3+uniqueNames[i].length+s4);
         a++;
       }
@@ -768,7 +887,7 @@ function findNames(lineArray) {
     } else {
       t1 = 2;
     }
-    if (isNaN(testString.substring(s1,s1+2))) {
+    if (isNaN(lineArray[i].substring(s1,s1+2))) {
       l1 = 1;
     } else {
       l1 = 2;
@@ -798,37 +917,12 @@ function findNames(lineArray) {
   return uniqueNames;
 }
 
-// format dates according to moment.js
-function formatDates(datesToFormat) {
-  var datesFormated = [];
-
-  for (i = 0; i < datesToFormat.length; i ++) {
-    // DD MM YY-> D MMM YY
-    var date = '20'+ datesToFormat[i].substring(6,8) +" "+ datesToFormat[i].substring(3,5) +" "+ datesToFormat[i].substring(0,2);
-
-    datesFormated[i] = moment(date, "YYYY MM DD").format('D MMM YY');
-  }
-
-  //console.log(date, datesFormated[i-1]);
-  return datesFormated;
-}
-
-function formatAll(data, datesF) {
-  var formated = [];
-  var counts = [];
+function addMissingDays(data) {
+  var formatedStruct = [];
+  var Item = makeStruct("date count");
 
   for(i = 0; i < data.length; i++) {
-    var datesToFormat = datesF[i];
-    var countToFormat = data[i][0].count;
-    var datesToCheck = data[i][0].date;
-    var countsT = [];
-    /*
-    console.log("--------");
-    console.log(i);
-    console.log(datesToFormat);
-    console.log(countToFormat);
-    */
-
+    var count = [];
     // Returns an array of dates between the two dates
     var getDates = function(startDate, endDate) {
       var dates = [],
@@ -844,32 +938,24 @@ function formatAll(data, datesF) {
       }
       return dates;
     };
-    // reformats dates to D MMM YY
 
-    var dates = getDates(new Date(20+datesToCheck[0].substring(6,8), parseInt(datesToCheck[0].substring(3,5)) - 1,datesToCheck[0].substring(0,2)), new Date(20+datesToCheck[datesToCheck.length-1].substring(6,8),datesToCheck[datesToCheck.length-1].substring(3,5),datesToCheck[datesToCheck.length-1].substring(0,2)));
-    for(j = 0; j < dates.length; j++){
-      //Sun May 18 2014 00:00:00 GMT+0200 (CEST)
-      dates[j] = moment(dates[j]).format('D MMM YY');
-    }
-    /*
-    console.log("---DATES---");
-    console.log(dates);
-    console.log(datesToFormat);
-    */
+    var dates = getDates(new Date(data[i].date[0]), new Date(data[i].date[data[i].date.length-1]));
+
     for (k = 0; k < dates.length; k ++) {
       // DD MM YY-> D MMM YY
-      var index = datesToFormat.indexOf(dates[k])
+      var index = data[i].date.indexOf(moment(dates[k]).format('YYYY-MM-DD'));
       if (index == -1) {
-        countsT[k] = 0;
+        count[k] = 0;
       } else {
-        countsT[k] = countToFormat[index];
+        count[k] = data[i].count[index];
       }
-      counts[i] = countsT;
     }
+
+    var obj = new Item(dates, count);
+    formatedStruct.push(obj);
   }
-  formated.push([dates, counts]);
-  //console.log("FORMATED", formated);
-  return formated;
+
+  return formatedStruct;
 }
 
 // ----- ---- ---- PERSONAL STATS -------------------- //
@@ -878,35 +964,13 @@ function formatAll(data, datesF) {
 function getMessagesPerDay(dates) {
   var dayCount = [0,0,0,0,0,0,0];
 
-  // check and reformat date to american standard MM.DD.YYY
-  var reformat = false;
-  for (var i = 0; i < dates.length; i++) {
-    if (dates[i].substring(0,2) > 12) {
-        // reformat
-        reformat = true;
-    }
-    if (dates[i].substring(3,5) > 12) {
-      // american notation
-      break;
-    }
-  }
-  //console.log(reformat);
-
   // evaluate and count
-  for (i = 0; i < dates.length; i++) {
-    if (reformat) {
-      var d = new Date("20"+dates[i].substring(6,7)+"-"+dates[i].substring(3,5) +"-" +dates[i].substring(0,2));
-    } else {
-      var d = new Date(("20"+dates[i].substring(6,7)+"-"+dates[i].substring(0,2) +"-" +dates[i].substring(3,5)));
-    }
+  for (var i = 0; i < dates.length; i++) {
+    var d = new Date(dates[i]);
     var dayNum = d.getDay();
-
-    //console.log("index" + i + "DayNum:" + dayNum + "Date:" + d + "Input:" + dates[i]);
     dayCount[dayNum]++;
   }
-  i = 0;
-    //console.log(dayNum);
-    //console.log(d);
+
   return dayCount;
 }
 
@@ -941,12 +1005,12 @@ function countMessages(dates) {
   }
 
   // save to struct
-  var messageCount = [];
+  //var dateCount = [];
   var Item = makeStruct("date count indexStart");
   var struct = new Item(date, count, indexStart);
-  messageCount.push(struct);
+  //dateCount.push(struct);
 
-  return messageCount;
+  return struct;
 }
 
 // activity by hour
