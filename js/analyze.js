@@ -806,7 +806,7 @@ function createStructs(lineArray) {
     // note if DD:MM or MM:DD
     var ddmm = false;
     for (var j = 0; j < lineArray.length; j++) {
-      if (lineArray[i].substring(s1,s1+l1) > 12) {
+      if (parseInt(lineArray[j].substring(s1,s1+l1)) > 12) {
         var ddmm = true;
         break;
       }
