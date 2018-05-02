@@ -34,6 +34,7 @@
     <!-- Custom styles for this template -->
     <link href="css/freelancer.css" rel="stylesheet">
 
+
   </head>
 
   <body id="page-top">
@@ -59,7 +60,7 @@
             <h2>Please unzip your file! Only .txt supported!</h2>
           </div>
           <div class="container groups" id="groups">
-            <h2>Group Chat's not supported so far :(.</h2>
+            <h2>Was this a group chat?</h2>
           </div>
           <div class="container loading text-center pt-1" id="loading">
             <h2 class="pb-2">Analyzing your chat!</h2>
@@ -70,7 +71,70 @@
 
 
       </div>
+
     </header>
+
+    <!-- feedback form --->
+          <div id="feedback">
+            <div id="feedback-form" style='display:none;background:white;' class="col-xs-4 panel panel-default">
+
+              <form role="form" method="post" id="reused_form" class="form panel-body pt-1">
+                <!--  <div class="row">
+                      <div class="col-sm-12 form-group">
+                          <label>How do you rate your overall experience?</label>
+                          <p>
+                              <label class="radio-inline">
+                                  <input type="radio" name="experience" id="radio_experience" value="bad" >
+                                  <i class="fa fa-frown-o fa-2x" aria-hidden="true"></i> Bad
+                              </label>
+                              <label class="radio-inline">
+                                  <input type="radio" name="experience" id="radio_experience" value="average" >
+                                  <i class="fa fa-meh-o fa-2x" aria-hidden="true"></i> Just OK
+                              </label>
+                              <label class="radio-inline">
+                                  <input type="radio" name="experience" id="radio_experience" value="good" >
+                                  <i class="fa fa-smile-o fa-2x" aria-hidden="true"></i> Good
+                              </label>
+                          </p>
+                      </div>
+                  </div>-->
+
+                      <div class="form-group">
+                          <label for="comments"> Comments:</label>
+                          <textarea class="form-control" type="textarea" id="comments" placeholder="Please provide your data format: e.g. dd:mm:yy hh:mm:ss name: text" name="comments" maxlength="6000"></textarea>
+                      </div>
+
+
+                      <div class="form-group">
+                          <label for="email"> Email:</label>
+                          <input type="email" class="form-control" placeholder="e-mail" id="email" name="email" required>
+                      </div>
+
+                      <div class="form-group">
+                          <button type="submit" class="btn btn-lg btn-warning pull-right pb-2 mb-2" iaria-hidden="true"></i>Send</button>
+                      </div>
+
+              </form>
+              <div id="success_message" style="width:100%; height:100%; display:none; "> <h3 class="text-secondary text-center pt-3">Posted your feedback successfully!</h3> </div>
+              <div id="error_message" style="width:100%; height:100%; display:none; "> <h3 class="text-secondary text-center">Error</h3> Sorry there was an error sending your form. </div>
+
+
+              <!--
+              <form method="POST" action="" class="form panel-body pt-2" role="form">
+                <div class="form-group">
+                  <input class="form-control" name="email" autofocus placeholder="Your e-mail" type="email" />
+                </div>
+                <div class="form-group">
+                  <textarea class="form-control" name="body" required placeholder="Please write your feedback here..." rows="5"></textarea>
+                </div>
+                <button class="btn btn-primary pull-right pb-2" type="submit">Send</button>
+              </form>
+            -->
+            </div>
+            <div id="feedback-tab">Feedback</div>
+          </div>
+
+
 
     <!-- Tutorial -->
     <section class="tutorial pt-5" id="tutorial">
@@ -197,20 +261,13 @@
       </div>
     </div>
 
-
-    <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
-    <div class="scroll-to-top d-lg-none position-fixed ">
-      <a class="js-scroll-trigger d-block text-center text-white rounded" href="#page-top">
-        <i class="fa fa-chevron-up"></i>
-      </a>
-    </div>
-
     <!-- Bootstrap core JavaScript -->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Plugin JavaScript -->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/feedback.js"></script>
 
     <!-- Custom scripts for this template -->
     <script src="js/freelancer.min.js"></script>
@@ -220,8 +277,9 @@
     <script src="js/Chart.min.js"></script>
     <!--<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.3.0/dist/chartjs-plugin-datalabels.min.js"></script>-->
 
-    <!-- read zip files-->
-    <!--<script src="js/jszip.min.js"></script>-->
+    <!-- feedback form-->
+    <script src="js/form.js"></script>
+
 
     <!-- My own scripts to analyze the chat file -->
     <script src="js/analyze.js"></script>
