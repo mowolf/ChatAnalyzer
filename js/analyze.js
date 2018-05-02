@@ -30,34 +30,34 @@ function readSingleFile(e) {
     // get data in right format
     var structArray = createStructs(createArray(contents));
     // checks if group chat
+    // hide error groups
+    var d = document.getElementById("groups");
+    d.style.display = "none";
     if (structArray.length > 2) {
       // groups not supported yet!
 
       var div = document.createElement('div');
       div.className = 'col-sm';
-      div.innerHTML = "<p>If you get this error even though this is no group chat search in your .txt file and replace this occurence:</p>" +
-                        structArray[2].name;
+      div.innerHTML = "<p>If you get this error even though this is no group chat you have probably copy-pased a chat in your chat. These are all the names I found. Trying to analyze these two people.</p>" +
+                        structArray[0].name+structArray[1].name;
       document.getElementById('groups').appendChild(div);
 
       var res = document.getElementById("groups");
       res.style.display = "block";
-      return;
-    } else {
-      // normal chat
-      // display Contents
-      displayContents(structArray);
-      // Hide Loading
-      var d = document.getElementById("loading");
-      d.style.display = "none";
+
+      structArray = [structArray[0],structArray[1]];
     }
+
+    displayContents(structArray);
+
+    // Hide Loading
+    var d = document.getElementById("loading");
+    d.style.display = "none";
     // Hide tutorial
     var d = document.getElementById("tutorial");
     d.style.display = "none";
     // Hide Error
     var d = document.getElementById("error");
-    d.style.display = "none";
-    // hide error groups
-    var d = document.getElementById("groups");
     d.style.display = "none";
     // show result page
     var d = document.getElementById("results");
@@ -887,10 +887,20 @@ function findNames(lineArray) {
     } else {
       t1 = 2;
     }
+    if (isNaN(lineArray[i].substring(s1+l1+1+l2+1+l3+s2+t1+1,s1+l1+1+l2+1+l3+s2+t1+1+2))) {
+      t2 = 1;
+    } else {
+      t2 = 2;
+    }
     if (isNaN(lineArray[i].substring(s1,s1+2))) {
       l1 = 1;
     } else {
       l1 = 2;
+    }
+    if (isNaN(lineArray[i].substring(s1+l1+1,s1+l1+1+2))) {
+      l2 = 1;
+    } else {
+      l2 = 2;
     }
 
     firstIndex = s1+l1+1+l2+1+l3+s2+t1+1+t2+1+t3+t4+sep3;
