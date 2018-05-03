@@ -190,7 +190,8 @@ function displayContents(content) {
       }
       var div = document.createElement('div');
       div.className = 'col-sm';
-      div.innerHTML = "<h4>" + content[i].name + "</h4>" +
+      div.innerHTML = "<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>" + 
+                      "<h4>" + content[i].name + "</h4>" +
                       "<p> Messages sent: <b>" + messagesCount[i] + "</b></p>" +
                       "<p> Words per Message: <b>" + wordsPerMessage[i][0] + "</b></p>" +
                       "<p> Pictures sent: <b>" + sentPicsCount[i] + "</b></p>" +
