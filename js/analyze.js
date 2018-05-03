@@ -98,7 +98,7 @@ function displayContents(content) {
     var Words = getWordCount(content[i].message);
     // ATTENTION: These strings have some weird invisible space character between "<" and "bild" !!!!
     // TODO: BUG: Support all img variants
-    var str4Pic = ["_<‎bild","_<‎picture"];
+    var str4Pic = ["_<‎bild","_<media", "_<picture"];
     var sentPicsIndex = [-1,-1];
     var sentAudioIndex = [-1,-1];
     var sentAudioCount = [0,0];
@@ -150,7 +150,7 @@ function displayContents(content) {
       // renove unwanted words
       // find position of "weggelassen>"
       // TODO: Add other languages
-      var endOfMedia = ["_weggelassen>"];
+      var endOfMedia = ["_weggelassen>", "_ommited>"];
 
       for (var j = 0; j < mostUsed.length; j++) {
         if (mostUsed[j][0] == endOfMedia[0]) {
@@ -708,10 +708,14 @@ function filterUsers(structArray) {
           }
         }
 
+        var ss = "00";
         var hh = parseInt(timeMatch[2]) + pm;
         var mm = timeMatch[3];
         if (timeMatch[6] != null) {
-          var ss = timeMatch[6];
+          ss = timeMatch[6];
+          if (ss.length == 0) {
+            ss = "00";
+          }
         }
 
         if (hh.length == 1) {
@@ -720,12 +724,7 @@ function filterUsers(structArray) {
         if (mm.length == 1) {
           mm = "0" + mm;
         }
-        if (ss.length == 1) {
-          ss = "0" + ss;
-        }
-        if (ss.length == 0) {
-          ss = "00";
-        }
+
 
         time[a] = hh+":"+mm+":"+ss;
 
