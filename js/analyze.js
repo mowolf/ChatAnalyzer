@@ -12,7 +12,7 @@ var str4Audio = ["_<‎audio"];
 
 // If you notice words that are not part of your chat (i.g. identifiers) of your language in
 // ATTENTION: PLEASE BE SURE TO COPY AND PASTE FROM YOUR CHAT LOG !!!!
-var unwantedWords = ["","_weggelassen>", "_ommited>"];
+var unwantedWords = ["_","_weggelassen>", "_ommited>"];
 
 /// ----------------------------- \ GENERAL Config END /--------------------------------
 
@@ -183,15 +183,22 @@ function displayContents(content) {
     mostUsed.splice(sentAudioIndex[i], 1);
 
     // remove all unwanted words
+    var id = 0
+    var indexToDel = [];
     for (var j = 0; j < mostUsed.length; j++) {
       for (var k = 0; k < unwantedWords.length; k++) {
         if (mostUsed[j][0] == unwantedWords[k]) {
-          mostUsed.splice(j, 1);
-          //
-          j = j-1;
+          indexToDel[id] = j;
+          id++;
         }
       }
     }
+    id = 0;
+    for (var j = 0; j < indexToDel.length; j++) {
+      mostUsed.splice(indexToDel[j]-id, 1);
+      id++;
+    }
+
 
     // HTML CONSTRUCTION ------------------------------------
     var mostUsedHTML ="";
