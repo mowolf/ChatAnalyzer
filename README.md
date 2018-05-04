@@ -20,8 +20,21 @@ The application works completly offline once the page has loaded. You can turn o
 
 Please open a [new Github Issue](https://github.com/mowolf/ChatAnalyzer/issues/new) if you find any issues or have suggestions/improvements for the project.
 
-Please also supply your data format (e.g. `[07.09.17, 6:44:16 PM] NAME: message`) if you are having a specific problem with data not loading correctly.
+Please also supply your data format (e.g. `[07.09.17, 6:44:16 PM] NAME: message`) and Language/Region setting of our phone if you are having a specific problem with data not loading correctly.
 
+## Have a great idea for a new graph?
+
+Head over to [planned features](https://github.com/mowolf/ChatAnalyzer/labels/enhancement) and add your idea if it's missing!
+
+## Wanna help making this better?
+
+Cheers! You are very welcome! Just submit a pull request. The goal of this tool is to automize the parsing as much as possible.
+
+### Add your language identifier for audio/video/pictures
+
+Please see the header of `analyze.js`. There you can add your identifiers.
+
+### How the data is formated
 
 ## ☕️ Caffeine fund ☕️
 
