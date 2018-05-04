@@ -2,6 +2,12 @@
 
 A JavaScript application to analyze WhatsApp chat history locally in your browser.
 
+## ☕️ Caffeine fund ☕️
+
+If you found this tool useful or fun, please consider buying me a coffee 😀
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5PTUQRRMS2X6E)
+
 ## Usage
 
 * Clone the repository `git clone https://github.com/mowolf/ChatAnalyzer.git`
@@ -38,19 +44,24 @@ Please see the header of `analyze.js`. There you can add your identifiers.
 
 The chat data is parsed via regex and splitted into it's parts. There are two variables that hold the data.
 
-`
-// structArray: Formatted line data in the form of a struct with the keys: name date time message
-//              name: "Name Surname"
-//              date: "YYYY-MM-DD"
-//              time: "HH:MM:SS"
-//              each key represents an array, the index represents the line number
-//              e.g. structArray.date[0] is the date of the first line
-// userStruct: array of structs with the keys: name date time message
-//           : for every person there is one struct, same format as above, index represents messageNumber of name
-`
+*`structArray`:*
+Formatted line data in the form of a struct with the keys: name date time message
 
-## ☕️ Caffeine fund ☕️
+- `name`: "Name Surname"
+- `date`: "YYYY-MM-DD"
+- `time`: "HH:MM:SS"
+- `message`: text
 
-If you found this tool useful or fun, please consider buying me a coffee 😀
+each key represents an array, the index represents the line number
+e.g. structArray.date[0] is the date of the first line
 
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5PTUQRRMS2X6E)
+*`userStruct`:*
+
+Array of structs with the keys:
+
+- `name`: "Name Surname"
+- `date`: "YYYY-MM-DD"
+- `time`: "HH:MM:SS"
+- `message`: text
+
+For every person there is one struct, same format as above, the `index` represents messageNumber of `name`.
