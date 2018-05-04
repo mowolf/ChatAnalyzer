@@ -38,7 +38,7 @@ Please see the header of `analyze.js`. There you can add your identifiers.
 
 The chat data is parsed via regex and splitted into it's parts. There are two variables that hold the data.
 
-
+`
 // structArray: Formatted line data in the form of a struct with the keys: name date time message
 //              name: "Name Surname"
 //              date: "YYYY-MM-DD"
@@ -46,8 +46,8 @@ The chat data is parsed via regex and splitted into it's parts. There are two va
 //              each key represents an array, the index represents the line number
 //              e.g. structArray.date[0] is the date of the first line
 // userStruct: array of structs with the keys: name date time message
-//           : for every person there is one struct, same format as above
-
+//           : for every person there is one struct, same format as above, index represents messageNumber of name
+`
 
 ## ☕️ Caffeine fund ☕️
 
