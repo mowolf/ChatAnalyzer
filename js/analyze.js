@@ -16,12 +16,18 @@ var unwantedWords = ["","_weggelassen>", "_ommited>"];
 
 /// ----------------------------- \ GENERAL Config END /--------------------------------
 
+// TODO: add group support (make carousell for groups)
+// TODO: add words per messages and plot the change over time
+// TODO: Make sure all variables are resetted when choosing the next file! -> write initalizer
+// TODO: filter out most common words
+// TODO: Most used emojies
 
 /// ----------------------------- \ Code /----------------------------------------------
 
-// add file listener for chat file
+// file listener
 document.getElementById('file-input')
   .addEventListener('change', readSingleFile, false);
+
 
 //Read File
 function readSingleFile(e) {
@@ -50,6 +56,16 @@ function readSingleFile(e) {
     // get data in right format
     var structArray = createStruct(contents);
     var userStruct = filterUsers(structArray);
+
+    // structArray: Formatted line data in the form of a struct with the keys: name date time message
+    //              name: "Name Surname"
+    //              date: "YYYY-MM-DD"
+    //              time: "HH:MM:SS"
+    //              each key represents an array, the index represents the line number
+    //              e.g. structArray.date[0] is the date of the first line
+    // userStruct: array of structs with the keys: name date time message
+    //           : for every person there is one struct, same format as above, index represents messageNumber of name
+
 
     // hide error groups
     var d = document.getElementById("groups");
@@ -98,10 +114,6 @@ function readSingleFile(e) {
 
 // Display all data
 function displayContents(content) {
-
-  // TODO: add group support (make carousell for groups)
-  // TODO: add words per messages and plot the change over time
-  // TODO: Make sure all variables are resetted when choosing the next file! -> write initalizer
 
   // contents is an object: name, message, date, time
 
@@ -181,42 +193,37 @@ function displayContents(content) {
       }
     }
 
-  }
-    // filter out most common words
+    // HTML CONSTRUCTION ------------------------------------
+    var mostUsedHTML ="";
+    //console.log(wordsPerMessage[i][1]);
+    if (mostUsed.length > 29) {
+      max = 30;
+    } else {
+      max = mostUsed.length;
+    }
 
-      // Most used emojies
-
-      // HTML CONSTRUCTION ------------------------------------
-      var mostUsedHTML ="";
-      //console.log(wordsPerMessage[i][1]);
-      if (mostUsed.length > 29) {
-        max = 30;
-      } else {
-        max = mostUsed.length;
-      }
-
-      for (var j = 0; j < max; j++) {
-        mostUsedHTML = mostUsedHTML + "<p>" + mostUsed[j][0].substring(1) +" - "+ Math.round(mostUsed[j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
-      }
-      var btn = "<button type='button' class='btn' data-toggle='collapse' data-target='#mostUsed"+i+"''>" +
-                "<i class='fas fa-chevron-down'></i></button>";
+    for (var j = 0; j < max; j++) {
+      mostUsedHTML = mostUsedHTML + "<p>" + mostUsed[j][0].substring(1) +" - "+ Math.round(mostUsed[j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
+    }
+    var btn = "<button type='button' class='btn' data-toggle='collapse' data-target='#mostUsed"+i+"''>" +
+              "<i class='fas fa-chevron-down'></i></button>";
 
 
-      // clear data from previous analyzations
-      if (i == 0) {
-        document.getElementById('users').innerHTML = "";
-      }
-      var div = document.createElement('div');
-      div.className = 'col-sm';
-      div.innerHTML = "<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>" +
-                      "<h4>" + content[i].name + "</h4>" +
-                      "<p> Messages sent: <b>" + messagesCount[i] + "</b></p>" +
-                      "<p> Words per Message: <b>" + wordsPerMessage[i][0] + "</b></p>" +
-                      "<p> Pictures sent: <b>" + sentPicsCount[i] + "</b></p>" +
-                      //"<p> Audio sent:" + sentAudioCount[i] + "</p>" +
-                      "<p>"+ btn + "<b> Most used words:</b></p>"+
-                      "<div id='mostUsed"+i+"' class='collapse in'>" + mostUsedHTML + "</div>";
-      document.getElementById('users').appendChild(div);
+    // clear data from previous analyzations
+    if (i == 0) {
+      document.getElementById('users').innerHTML = "";
+    }
+    var div = document.createElement('div');
+    div.className = 'col-sm';
+    div.innerHTML = "<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>" +
+                    "<h4>" + content[i].name + "</h4>" +
+                    "<p> Messages sent: <b>" + messagesCount[i] + "</b></p>" +
+                    "<p> Words per Message: <b>" + wordsPerMessage[i][0] + "</b></p>" +
+                    "<p> Pictures sent: <b>" + sentPicsCount[i] + "</b></p>" +
+                    //"<p> Audio sent:" + sentAudioCount[i] + "</p>" +
+                    "<p>"+ btn + "<b> Most used words:</b></p>"+
+                    "<div id='mostUsed"+i+"' class='collapse in'>" + mostUsedHTML + "</div>";
+    document.getElementById('users').appendChild(div);
   }
 
   // TODO:words bar Graph
@@ -509,7 +516,7 @@ function displayContents(content) {
 
   // CHRONOLOGICAL WORDS PER MESSAGE ------------------------------------------------------------------------
   //messages[i].trim().split(/\s+/).length;
-/*
+  /*
   var ctx = document.getElementById('chronologicalGraph2').getContext('2d');
   ctx.canvas.width = 1400;
   ctx.canvas.height = 500;
@@ -574,6 +581,7 @@ function displayContents(content) {
   var chart = new Chart(ctx, cfg);
 */
   // show chat of clicked day ------------------------------------------------
+
 }
 
 
