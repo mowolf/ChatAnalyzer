@@ -190,7 +190,7 @@ function displayContents(content) {
       }
       var div = document.createElement('div');
       div.className = 'col-sm';
-      div.innerHTML = "<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>" + 
+      div.innerHTML = "<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>" +
                       "<h4>" + content[i].name + "</h4>" +
                       "<p> Messages sent: <b>" + messagesCount[i] + "</b></p>" +
                       "<p> Words per Message: <b>" + wordsPerMessage[i][0] + "</b></p>" +
@@ -580,10 +580,11 @@ function createStruct(content) {
    // REGEX
    // https://www.debuggex.com/r/G5iGDvohGF8krt8Y
    // This regex is used to find the start index of every message (including special messages)
-   var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\s.{1,2}\\s|\\s)|,\\s|\\.\\s){1}(((\\d{1,2}\:)\\d{2}(:\\d{2})?)(\\s(a|p)?m|\\s(A|P)?M|\s(a|p)?\\.\\s\\m\\.)?)(\\]\\s|\\s\\-\\s|\\:)([^:\\-.]*)","g");
+   var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\s.{1,2}\\s|\\s)|,\\s|\\.\\s){1}(((\\d{1,2}\\:)\\d{2}(:\\d{2})?)(\\s(a|p)?m|\\s(A|P)?M|\\s(a|p)?\\.\\s\\m\.)?)(\\]\\s|\\s\\-\\s|\\:)","g");
+   var reD = new RegExp("(:)");
 
    var indexArray = [];
-   var nameEndIndexArray = [];
+   var messageStartIndexArray = [];
    var nameArray = [];
    var timeArray = [];
    var dateArray = [];
@@ -592,8 +593,9 @@ function createStruct(content) {
    while ((match = re.exec(content)) != null) {
      //console.log("match found at " + match.index);
      indexArray[i] = match.index;
-     nameEndIndexArray[i] = match[0].length;
-     nameArray[i] = match[16];
+     // currently this array stores the index after the identifier
+     messageStartIndexArray[i] = match[0].length;
+     //nameArray[i] = match[16];
      timeArray[i] = match[7];
      dateArray[i] = match[2];
      i++;
@@ -601,12 +603,41 @@ function createStruct(content) {
 
    // create messsages
    var messageArray = [];
+   var nameLengthArray = [];
+   var temp = "";
+
    for (var i = 0; i < indexArray.length; i++) {
-     // fill array
+
       if (i == indexArray.length - 1) {
-        messageArray[i] = content.substring(indexArray[i]+nameEndIndexArray[i], content.length-1);
+        temp = content.substring(indexArray[i]+messageStartIndexArray[i], content.length-1);
       } else {
-        messageArray[i] = content.substring(indexArray[i]+nameEndIndexArray[i], indexArray[i+1]);
+        temp = content.substring(indexArray[i]+messageStartIndexArray[i], indexArray[i+1]);
+      }
+
+      match = reD.exec(temp);
+      if (match != null) {
+        nameLengthArray[i] = match.index ;
+        nameArray[i] = temp.substring(0,match.index);
+      } else {
+        nameLengthArray[i] = 0 ;
+        nameArray[i] = "ER: NO NAME FOUND";
+      }
+      // search for a name and add it's length to the index
+      /*
+      if (temp.indexOf(":") > 0) {
+        // if we find a name add the index of the seperator
+        messageStartIndexArray[i] = messageStartIndexArray[i] + temp.indexOf(":") ;
+        // update name
+        nameArray[i] = temp.substring(temp.indexOf(":"),messageStartIndexArray);
+      } else {
+        nameArray[i] = "ER: NO NAME FOUND";
+      }*/
+
+      // fill array
+      if (i == indexArray.length - 1) {
+        messageArray[i] = content.substring(indexArray[i]+messageStartIndexArray[i]+nameLengthArray[i], content.length);
+      } else {
+        messageArray[i] = content.substring(indexArray[i]+messageStartIndexArray[i]+nameLengthArray[i], indexArray[i+1]);
       }
     }
 
@@ -614,14 +645,11 @@ function createStruct(content) {
   // e.g. announcments when people get added to groups, security change etc
   var delArray = [];
   var a = 0;
-  for (var i = 0; i < messageArray.length; i++)  {
-    if (messageArray[i].indexOf(":") != 0) {
+  for (var i = 0; i < nameArray.length; i++)  {
+    if (nameArray[i] == "ER: NO NAME FOUND") {
       // no ":" found. Delete this line
       delArray[a] = i;
       a++;
-    } else {
-      // remove the ": " from the string
-      messageArray[i] = messageArray[i].substring(2)
     }
   }
 
