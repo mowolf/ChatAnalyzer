@@ -1,3 +1,24 @@
+/// ----------------------------- \ GENERAL Config START /------------------------------
+
+// If you notice that your picture cont = 0 please add the identifier of your language in
+// lowercase and adding a "_" to the start e.g. "<Media" -> "_<media"
+// ATTENTION: These strings might have some weird invisible space character between "<" and "media" !!!!
+// ATTENTION: BE SURE TO COPY AND PASTE FROM YOUR CHAT LOG !!!!
+var str4Pic = ["_<‎bild","_<‎media", "_<‎picture", "<‎attached>"];
+
+// If you notice that your audio cont = 0 please add the identifier of your language in
+// ATTENTION: BE SURE TO COPY AND PASTE FROM YOUR CHAT LOG !!!!
+var str4Audio = ["_<‎audio"];
+
+// If you notice words that are not part of your chat (i.g. identifiers) of your language in
+// ATTENTION: PLEASE BE SURE TO COPY AND PASTE FROM YOUR CHAT LOG !!!!
+var unwantedWords = ["","_weggelassen>", "_ommited>"];
+
+/// ----------------------------- \ GENERAL Config END /--------------------------------
+
+
+/// ----------------------------- \ Code /----------------------------------------------
+
 // add file listener for chat file
 document.getElementById('file-input')
   .addEventListener('change', readSingleFile, false);
@@ -5,8 +26,8 @@ document.getElementById('file-input')
 //Read File
 function readSingleFile(e) {
 
+  // handle file
   var file = e.target.files[0];
-
   if ((!file) || (file.type != "text/plain")) {
     console.log("ERROR! No txt file selected!");
     var er = document.getElementById("error");
@@ -17,15 +38,14 @@ function readSingleFile(e) {
     return;
   }
 
-  // Show loading
+  // Show loading icon
   var d = document.getElementById("loading");
   d.style.display = "block";
 
+  // executes on load of file
   var reader = new FileReader();
-
-  // execude on load of file
   reader.onload = function(e) {
-    //
+
     var contents = e.target.result;
     // get data in right format
     var structArray = createStruct(contents);
@@ -37,25 +57,28 @@ function readSingleFile(e) {
 
     // checks if group chat
     if (userStruct.length > 2) {
-      // groups not supported yet!
+      // GROUP CHAT ----------------------------------------------------------------------
 
-      // clear
+      // Show Error four Groups
       document.getElementById('groups').innerHTML = "";
-      //
       var div = document.createElement('div');
       div.className = 'col-sm';
       div.innerHTML = "<p>If you get this error even though this is no group chat you have probably copy-pased a chat in your chat. Trying to analyze for these two people.</p>" +
                         userStruct[0].name+userStruct[1].name;
-      document.getElementById('groups').appendChild(div);
 
-      var res = document.getElementById("groups");
-      res.style.display = "block";
+      var erG = document.getElementById("groups");
+      erG.appendChild(div);
+      erG.style.display = "block";
 
+      // TODO: Add group support
       userStruct = [userStruct[0],userStruct[1]];
+      displayContents(userStruct);
+    } else {
+      // NORMAL CHAT ----------------------------------------------------------------------
+      displayContents(userStruct);
     }
 
-    displayContents(userStruct);
-
+    // CLEAN HTML -------------------------------------------------------------------------
     // Hide Loading
     var d = document.getElementById("loading");
     d.style.display = "none";
@@ -82,12 +105,11 @@ function displayContents(content) {
 
   // contents is an object: name, message, date, time
 
-  // USER SPECIFC  ------------------------------------------------------------------------------------
+  // USER SPECIFIC  ------------------------------------------------------------------------------------
   var wordsPerMessage = [];
   var messagesCount = [0,0];
-  for (var i = 0; i < 2; i++) {
+  for (var i = 0; i < content.length; i++) {
     // message Count ----------------------------------------
-
     messagesCount[i] = content[i].message.length;
 
     // Words per message ------------------------------------
@@ -96,9 +118,7 @@ function displayContents(content) {
 
     // Most used words --------------------------------------
     var Words = getWordCount(content[i].message);
-    // ATTENTION: These strings have some weird invisible space character between "<" and "bild" !!!!
-    // TODO: BUG: Support all img variants
-    var str4Pic = ["_<‎bild","_<media", "_<picture"];
+
     var sentPicsIndex = [-1,-1];
     var sentAudioIndex = [-1,-1];
     var sentAudioCount = [0,0];
@@ -122,49 +142,47 @@ function displayContents(content) {
             }
           }
         }
-      }
+    }
 
-      // evaluate how many pics were sent
-      for (var j = 0; j < mostUsed.length; j++) {
-        if (mostUsed[j][0] == str4Pic[0]) {
+    // evaluate how many pics were sent
+    for (var j = 0; j < mostUsed.length; j++) {
+      for (var k = 0; k < str4Pic.length; k++) {
+        if (mostUsed[j][0] == str4Pic[k]) {
           sentPicsIndex[i] = j;
           sentPicsCount[i] = mostUsed[j][1];
           break;
         }
       }
-      // console.log(mostUsed);
-      // remove it from the array
-      mostUsed.splice(sentPicsIndex[i], 1);
+    }
+    // remove it from the array
+    mostUsed.splice(sentPicsIndex[i], 1);
 
-      // --  evaluate how many audio files were sent
-      for (var j = 0; j < mostUsed.length; j++) {
-        if (mostUsed[j][0] == "_<‎audio") {
+    // --  evaluate how many audio files were sent
+    for (var j = 0; j < mostUsed.length; j++) {
+      for (var k = 0; k < str4Audio.length; k++) {
+        if (mostUsed[j][0] == str4Audio[k]) {
           sentAudioIndex[i] = j;
           sentAudioCount[i] = mostUsed[j][1];
           break;
         }
       }
-      // remove it from array
-      mostUsed.splice(sentAudioIndex[i], 1);
+    }
+    // remove it from array
+    mostUsed.splice(sentAudioIndex[i], 1);
 
-      // renove unwanted words
-      // find position of "weggelassen>"
-      // TODO: Add other languages
-      var endOfMedia = ["_weggelassen>", "_ommited>"];
-
-      for (var j = 0; j < mostUsed.length; j++) {
-        if (mostUsed[j][0] == endOfMedia[0]) {
+    // remove all unwanted words
+    for (var j = 0; j < mostUsed.length; j++) {
+      for (var k = 0; k < unwantedWords.length; k++) {
+        if (mostUsed[j][0] == unwantedWords[k]) {
           mostUsed.splice(j, 1);
-          break;
+          //
+          j = j-1;
         }
       }
-      for (var j = 0; j < mostUsed.length; j++) {
-        if (mostUsed[j][0] == "") {
-          mostUsed.splice(sentPicsIndex[j], 1);
-          break;
-        }
-      }
-      // filter out most common words
+    }
+
+  }
+    // filter out most common words
 
       // Most used emojies
 
