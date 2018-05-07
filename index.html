@@ -34,6 +34,7 @@
   <body id="page-top">
 
     <h5 class="text-center pt-2 text-secondary">No chat data is uploaded - works 100% offline - <a href="https://github.com/mowolf/ChatAnalyzer" target="_blank" class"text-small">Source Code <i class="fab fa-github"></i></a> </h5>
+
     <!-- Header -->
     <header class="masthead bg-primary text-white">
       <div class="container">
@@ -51,6 +52,8 @@
           </label>
 
           <p> </p>
+
+          <h5 class="text-center text-small" id="uBlock">If it does not work make sure to disable extentions like uBlock (or visit this site in incognito mode)!!</h5>
 
           <div class="container error" id="error">
             <h2>Please unzip your file! Only .txt supported!</h2>
@@ -123,7 +126,6 @@
             <p class="text-center text-muted small"> For more info please click <a href="https://faq.whatsapp.com/en/android/23756533/">here</a>.</p>
 
           </div>
-          <h5 class="col-md-6 offset-md-3 text-center">If it does not work make sure to disable extentions like uBlock (or visit this site in incognito mode)!!</h5>
 
         </div>
         <hr class="style1">
@@ -180,17 +182,17 @@
             <div class="text-center pt-3 pb-2 userRows text-white" id="usersRows">
               <!-- colums USER DATA -->
             </div>
+          </div>
 
-            <!-- Messages per day -->
-            <h2 class="text-center text-uppercase text-secondary mb-0 mt-5 pb-2 pt-2">Messages per Weekday</h2>
-            <div class="row pt-4">
-              <canvas id="dayRadar"></canvas>
-            </div>
-            <!-- Chronological View -->
-            <h2 class="text-center text-uppercase text-secondary mb-0 mt-5 pb-2 pt-3">Chronological Graph</h2>
-            <div class="row pt-4">
-              <canvas id="chronologicalGraph"></canvas>
-            </div>
+          <!-- Messages per day -->
+          <h2 class="text-center text-uppercase text-secondary mb-0 mt-5 pb-2 pt-2">Messages per Weekday</h2>
+          <div class="row pt-4">
+            <canvas id="dayRadar"></canvas>
+          </div>
+          <!-- Chronological View -->
+          <h2 class="text-center text-uppercase text-secondary mb-0 mt-5 pb-2 pt-4">Chronological Graph</h2>
+          <div class="row pt-4">
+            <canvas id="chronologicalGraph"></canvas>
           </div>
 
           <!-- Chronological View -->

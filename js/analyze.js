@@ -1,4 +1,4 @@
-/// ----------------------------- \ GENERAL Config START /------------------------------
+/// ----------------------------- \ GENERAL Config START /----------------------
 
 // If you notice that your picture cont = 0 please add the identifier of your language in
 // lowercase and adding a "_" to the start e.g. "<Media" -> "_<media"
@@ -22,12 +22,11 @@ var unwantedWords = ["_","_weggelassen>", "_ommited>"];
 // TODO: filter out most common words
 // TODO: Most used emojies
 
-/// ----------------------------- \ Code /----------------------------------------------
+/// ----------------------------- \ Code /--------------------------------------
 
 // file listener
 document.getElementById('file-input')
   .addEventListener('change', readSingleFile, false);
-
 
 //Read File
 function readSingleFile(e) {
@@ -52,12 +51,13 @@ function readSingleFile(e) {
   document.getElementById('groupTableRows').innerHTML = "";
   document.getElementById('users').innerHTML = "";
   document.getElementById('groupInfo').innerHTML = "";
+  document.getElementById('usersRows').innerHTML = "";
 
   // hide Stuff
+  document.getElementById("uBlock").style.display = "none";
   document.getElementById("groupInfo").style.display = "none";
   document.getElementById("group").style.display = "none";
   document.getElementById("1on1chat").style.display = "none";
-
 
   // executes on load of file
   var reader = new FileReader();
@@ -68,6 +68,7 @@ function readSingleFile(e) {
     var structArray = createStruct(contents);
     var userStruct = filterUsers(structArray);
 
+    // NOTE:
     // structArray: Formatted line data in the form of a struct with the keys: name date time message
     //              name: "Name Surname"
     //              date: "YYYY-MM-DD"
@@ -76,6 +77,11 @@ function readSingleFile(e) {
     //              e.g. structArray.date[0] is the date of the first line
     // userStruct: array of structs with the keys: name date time message
     //           : for every person there is one struct, same format as above, index represents messageNumber of name
+
+    // create colors:
+    backgroundColorArray = ["rgba(20, 168, 204, 0.2)", "rgba(255, 72, 64, 0.2)"];
+    colorArray = ["rgb(20, 168, 204)", "rgb(255, 72, 64)"];
+
 
     // checks if group chat
     if (userStruct.length > 2) {
@@ -88,14 +94,17 @@ function readSingleFile(e) {
       var div = document.createElement('div');
       div.className = 'col-sm';
       div.innerHTML = "<p>If this is no group chat you have probably copy-pased a chat in your chat. Please open your chat file and eliminate the other people.</p>";
-
       var erG = document.getElementById("groupInfo");
       erG.appendChild(div);
       erG.style.display = "block";
-
       document.getElementById("group").style.display = "block";
 
+      // create COLORS
+      for (var i = 0; i < userStruct.length; i++) {
+        colorArray.push(getRandomColor());
+      }
 
+      // analyze
       displayGroup(userStruct);
     } else {
       // NORMAL CHAT ----------------------------------------------------------------------
@@ -122,10 +131,11 @@ function readSingleFile(e) {
   reader.readAsText(file);
 }
 
-// NOTE: this is the function that gets executed on normal chats
-// Display normal 1 on 1 chat data
-function displayChat(content) {
 
+// # ------------------------------------------------------------------------- #
+// 1ON1 CHAT -------------------------------------------------------------------
+// NOTE: this is the function that gets executed on normal chats
+function displayChat(content) {
   // contents is an object: name, message, date, time
 
   // USER SPECIFIC  ------------------------------------------------------------------------------------
@@ -232,60 +242,18 @@ function displayChat(content) {
         }
         });
   */
-  // factors ------------------------------------------------------
-  // find who writes more
 
   // Messages per Day Radar -----------------------------------------------------------------------------
-  var dayCount = [getMessagesPerDay(content[0].date), getMessagesPerDay(content[1].date)];
-  new Chart(
-        document.getElementById("dayRadar"),
-        {
-        type:"radar",
-        data:{labels:[ ["Sunday", ""],"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
-        datasets:[
-          {label:content[0].name,
-          data:dayCount[0],
-          fill:true,
-          backgroundColor:"rgba(20, 168, 204, 0.2)",
-          borderColor:"rgb(20, 168, 204)",
-          pointBackgroundColor:"rgb(20, 168, 204)",
-          pointBorderColor:"#fff",
-          pointHoverBackgroundColor:"#fff",
-          pointHoverBorderColor:"rgb(20, 168, 204)"},
-          {label:content[1].name,
-          data:dayCount[1],
-          fill:true,
-          backgroundColor:"rgba(255, 72, 64, 0.2)",
-          borderColor:"rgb(255, 72, 64)",
-          pointBackgroundColor:"rgb(255, 72, 64)",
-          pointBorderColor:"#fff",
-          pointHoverBackgroundColor:"#fff",
-          pointHoverBorderColor:"rgb(255, 72, 64)"}]},
-        options:{
-            elements:{
-              line:{
-                tension:0,
-                borderWidth:3
-              }
-            },
-            scale:{
-              ticks: {
-                beginAtZero: true
-              },
-              pointLabels :{
-                fontStyle: "bold",
-                fontColor: 'black',
-                fontSize: 14
-              }
-            }
-          }
-        });
+  createDayRadar(content);
+
 
   // CHRONOLOGICAL GRAPH --------------------------------------------------------------------------------
   // returns struct "date count indexStart"
+  createChonologicalGraph(content);
   messageCount = [countMessages(content[0].date), countMessages(content[1].date)];
   formatedStruct = addMissingDays(messageCount);
 
+  /*
   // better tooltips
   Chart.defaults.global.pointHitDetectionRadius = 1;
   var customTooltips = function(tooltip) {
@@ -357,7 +325,6 @@ function displayChat(content) {
   			tooltipEl.style.fontStyle = tooltip._bodyFontStyle;
   			tooltipEl.style.padding = tooltip.yPadding + 'px ' + tooltip.xPadding + 'px';
   		};
-
   // graph
   var ctx = document.getElementById('chronologicalGraph').getContext('2d');
   ctx.canvas.width = 1400;
@@ -424,12 +391,9 @@ function displayChat(content) {
         }
   };
   var chart = new Chart(ctx, cfg);
-
+  */
 
   // GLOBAL FACTORS -----------------------------------------------------------------------------------
-
-  // clear old data from previous analyzations
-  document.getElementById('usersRows').innerHTML = "";
 
   if (content[0].message.length > content[1].message.length) {
     var n0 = 0;
@@ -461,7 +425,7 @@ function displayChat(content) {
                   "<p>" + "Overall " + content[n0].name +" writes <b>" + percent + "</p>";
   document.getElementById('usersRows').appendChild(div);
 
-  // CHRONOLOGICAL WORDS PER MESSAGE -----------------------------------------------------------------------
+  // TODO: CHRONOLOGICAL WORDS PER MESSAGE
   //messages[i].trim().split(/\s+/).length;
   /*
   var ctx = document.getElementById('chronologicalGraph2').getContext('2d');
@@ -527,13 +491,19 @@ function displayChat(content) {
   };
   var chart = new Chart(ctx, cfg);
 */
-  // show chat of clicked day ------------------------------------------------
+  // show chat of clicked day --------------------------------------------------
 }
 
+// # ------------------------------------------------------------------------- #
+// GROUPS ----------------------------------------------------------------------
 // NOTE: this is the function that gets executed on group chats
 function displayGroup(content) {
+
 var wordsPerMessage = [];
 var messagesCount = [];
+
+// TODO: figure out the group name!
+
 // personal STATS
 for (var i = 0; i < content.length; i++) {
   // message Count ----------------------------------------
@@ -591,10 +561,15 @@ for (var i = 0; i < content.length; i++) {
 // sort table by most messages
 sortTable(1);
 
+// Day Radar
+createDayRadar(content);
+// Chronological Graph
+createChonologicalGraph(content);
 
 }
 
-// FUNCTIONS ----------------- ------ ------ ------ ------
+// # ------------------------------------------------------------------------- #
+// FUNCTIONS -------------------------------------------------------------------
 
 // struct factory
 // https://stackoverflow.com/questions/502366/structs-in-javascript
@@ -855,9 +830,6 @@ function addMissingDays(data) {
   return formatedStruct;
 }
 
-// ----- ---- ---- PERSONAL STATS -------------------- //
-
-
 // returns an orderd struct with words and how often they are used
 function getMostUsedWords(messages) {
 
@@ -939,8 +911,8 @@ function getMostUsedWords(messages) {
 }
 
 // helper function to count words
-// thanks to https://stackoverflow.com/a/6565353/7151828
 function getWordCount(messages) {
+  // thanks to https://stackoverflow.com/a/6565353/7151828
   var wordCounts = { };
   var words = messages.join(" ").split(/[\b\s(?:,| )+]/);
 
@@ -964,6 +936,7 @@ function getMessagesPerDay(dates) {
 
   return dayCount;
 }
+
 // activity by time
 function countMessages(dates) {
   // init
@@ -1002,11 +975,9 @@ function countMessages(dates) {
   return struct;
 }
 
-// activity by hour
+// TODO: activity by hour of day
 
-// 30 most used emoji per person
-
-// ---- ---- ---- TOTAL STATS
+// TODO: 30 most used emoji per person
 
 // average words per message
 function calcWordsPerMessage(messages) {
@@ -1017,11 +988,279 @@ function calcWordsPerMessage(messages) {
   return [(Math.round(tlt/messages.length*100)/100),tlt];
 }
 
-// average messages per day
+// TODO: average messages per day
 
-// --- TABEL SORTER
 
+// TABLES ----------------------------------------------------------------------
+
+// Day Radar
+function createDayRadar(content) {
+  var dayCount = [0,0,0,0,0,0,0];
+  var data = [];
+
+
+  for (var i = 0; i < content.length; i++) {
+    var temp = getMessagesPerDay(content[i].date);
+
+    if (content.length > 2) {
+      // in total
+      for (var j = 0; j < temp.length; j++) {
+        dayCount[j] += temp[j];
+      }
+
+    } else {
+      // per indivduum
+      // TODO: Add switch button
+      data.push({
+       label:content[i].name,
+       data:temp,
+       fill:true,
+       backgroundColor: backgroundColorArray[i],
+       borderColor: colorArray[i],
+       pointBackgroundColor:colorArray[i],
+       pointBorderColor:"#fff",
+       pointHoverBackgroundColor:"#fff",
+       pointHoverBorderColor: colorArray[i]
+     })
+    }
+  }
+
+  if (content.length > 2) {
+    data.push({
+     label:"Total Messages",
+     data:dayCount,
+     fill:true,
+     backgroundColor: backgroundColorArray[0],
+     borderColor: colorArray[0],
+     pointBackgroundColor:colorArray[0],
+     pointBorderColor:"#fff",
+     pointHoverBackgroundColor:"#fff",
+     pointHoverBorderColor: colorArray[0]
+     })
+  }
+
+  new Chart(
+        document.getElementById("dayRadar"),
+        {
+        type:"radar",
+        data:{labels:[["Sunday", ""],"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+        datasets: data},
+        options:{
+            elements:{
+              line:{
+                tension:0,
+                borderWidth:3
+              }
+            },
+            scale:{
+              ticks: {
+                beginAtZero: true
+              },
+              pointLabels :{
+                fontStyle: "bold",
+                fontColor: 'black',
+                fontSize: 14
+              }
+            }
+          }
+        });
+
+}
+
+// Chronological Graph
+function createChonologicalGraph(content) {
+
+  // better tooltips
+  Chart.defaults.global.pointHitDetectionRadius = 1;
+  var customTooltips = function(tooltip) {
+        // Tooltip Element
+        var tooltipEl = document.getElementById('chartjs-tooltip');
+
+        if (!tooltipEl) {
+          tooltipEl = document.createElement('div');
+          tooltipEl.id = 'chartjs-tooltip';
+          tooltipEl.innerHTML = '<table></table>';
+          this._chart.canvas.parentNode.appendChild(tooltipEl);
+        }
+
+        // Hide if no tooltip
+        if (tooltip.opacity === 0) {
+          tooltipEl.style.opacity = 0;
+          return;
+        }
+
+        // Set caret Position
+        tooltipEl.classList.remove('above', 'below', 'no-transform');
+        if (tooltip.yAlign) {
+          tooltipEl.classList.add(tooltip.yAlign);
+        } else {
+          tooltipEl.classList.add('no-transform');
+        }
+
+        function getBody(bodyItem) {
+          return bodyItem.lines;
+        }
+
+        // Set Text
+        if (tooltip.body) {
+          var titleLines = tooltip.title || [];
+          var bodyLines = tooltip.body.map(getBody);
+
+          var innerHtml = '<thead>';
+
+          titleLines.forEach(function(title) {
+            innerHtml += '<tr><th>' + title.substring(0,12) + '</th></tr>';
+            // the title is the date - we only want to show the day not the time
+          });
+          innerHtml += '</thead><tbody>';
+
+          bodyLines.forEach(function(body, i) {
+            var colors = tooltip.labelColors[i];
+            var style = 'background:' + colors.backgroundColor;
+            style += '; border-color:' + colors.borderColor;
+            style += '; border-width: 2px';
+            var span = '<span class="chartjs-tooltip-key" style="' + style + '"></span>';
+            innerHtml += '<tr><td>' +span + body + '</td></tr>';
+            // body is NAME: Count
+          });
+          innerHtml += '</tbody>';
+
+          var tableRoot = tooltipEl.querySelector('table');
+          tableRoot.innerHTML = innerHtml;
+        }
+
+        var positionY = this._chart.canvas.offsetTop;
+        var positionX = this._chart.canvas.offsetLeft;
+
+        // Display, position, and set styles for font
+        tooltipEl.style.opacity = 1;
+        tooltipEl.style.left = positionX + tooltip.caretX + 'px';
+        tooltipEl.style.top = positionY + tooltip.caretY + 'px';
+        tooltipEl.style.fontFamily = tooltip._bodyFontFamily;
+        tooltipEl.style.fontSize = tooltip.bodyFontSize + 'px';
+        tooltipEl.style.fontStyle = tooltip._bodyFontStyle;
+        tooltipEl.style.padding = tooltip.yPadding + 'px ' + tooltip.xPadding + 'px';
+      };
+
+  var messageCount = [];
+  var data = [];
+  for (var i = 0; i < content.length; i++) {
+    messageCount.push(countMessages(content[i].date))
+  }
+
+  var formatedStruct = addMissingDays(messageCount);
+  var totalActivity = [];
+
+  for (var i = 0; i < content.length; i++) {
+    if (content.length > 2) {
+      // add all activity up and only display the total
+      for(var j = 0; j < formatedStruct[i].count.length; j++){
+        if(totalActivity[j] == null) {
+          totalActivity[j] = 0;
+        }
+        totalActivity[j] = (formatedStruct[i].count[j] + totalActivity[j]);
+      }
+
+    } else {
+      // show eacg individual
+      data.push( {
+        label: content[i].name,
+        data: formatedStruct[i].count,
+        type: 'line',
+        fill: false,
+        steppedLine: true,
+        pointRadius: 0,
+        borderWidth: 1,
+        pointHoverRadius: 10,
+        backgroundColor:backgroundColorArray[i],
+        borderColor: colorArray[i],
+        pointBackgroundColor:colorArray[i],
+        pointBorderColor:"#fff",
+        pointHoverBackgroundColor:"#fff",
+        pointHoverBorderColor: colorArray[i]
+        });
+    }
+  }
+
+  // total
+  if (content.length > 2) {
+      data.push( {
+        label: "Total Activity",
+        data: totalActivity,
+        type: 'line',
+        fill: true,
+        steppedLine: true,
+        pointRadius: 0,
+        borderWidth: 1,
+        pointHoverRadius: 10,
+        backgroundColor:backgroundColorArray[0],
+        borderColor: colorArray[0],
+        pointBackgroundColor:colorArray[0],
+        pointBorderColor:"#fff",
+        pointHoverBackgroundColor:"#fff",
+        pointHoverBorderColor: colorArray[0]
+      });
+  }
+
+  // find label
+  var index = -1;
+  var temp = -1;
+  for (var i = 0; i < formatedStruct.length; i++) {
+    if (formatedStruct[i].date.length > temp) {
+      index = i;
+      temp = formatedStruct[i].date.length;
+    }
+  }
+
+var unit = "month";
+  if (formatedStruct[index].date.length < 22) {
+    unit = "day";
+  } else if (formatedStruct[index].date.length < 33) {
+    unit = "week";
+  } else if (formatedStruct[index].date.length < 33*3) {
+    unit = "month";
+  } else if (formatedStruct[index].date.length < 33* 15) {
+    unit = "year";
+  }
+
+  // create chart
+  new Chart(
+      document.getElementById('chronologicalGraph').getContext('2d'),
+      {
+        type: 'line',
+        data: {
+          labels: formatedStruct[index].date,
+          datasets: data
+        },
+          options: {
+            scales: {
+              xAxes: [{
+                type: 'time',
+                distribution: 'linear',
+                time: {
+                      unit: unit
+                }}],
+              yAxes: [{
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Number Of Messages'
+                }
+              }]},
+            tooltips: {
+              enabled: false,
+              mode: 'index',
+              position: 'nearest',
+              custom: customTooltips
+            }}
+        });
+
+}
+
+// OTHER -----------------------------------------------------------------------
+
+//  TABEL SORTER
 function sortTable(n) {
+  // https://www.w3schools.com/howto/howto_js_sort_table.asp
   var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
   table = document.getElementById("myTable");
   switching = true;
@@ -1086,4 +1325,15 @@ function sortTable(n) {
       }
     }
   }
+}
+
+// RANDOM COLORS
+function getRandomColor() {
+  // https://stackoverflow.com/questions/1484506/random-color-generator
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
 }
