@@ -48,6 +48,17 @@ function readSingleFile(e) {
   var d = document.getElementById("loading");
   d.style.display = "block";
 
+  // clear old Stuff
+  document.getElementById('groupTableRows').innerHTML = "";
+  document.getElementById('users').innerHTML = "";
+  document.getElementById('groupInfo').innerHTML = "";
+
+  // hide Stuff
+  document.getElementById("groupInfo").style.display = "none";
+  document.getElementById("group").style.display = "none";
+  document.getElementById("1on1chat").style.display = "none";
+
+
   // executes on load of file
   var reader = new FileReader();
   reader.onload = function(e) {
@@ -66,32 +77,31 @@ function readSingleFile(e) {
     // userStruct: array of structs with the keys: name date time message
     //           : for every person there is one struct, same format as above, index represents messageNumber of name
 
-
-    // hide error groups
-    var d = document.getElementById("groups");
-    d.style.display = "none";
-
     // checks if group chat
     if (userStruct.length > 2) {
       // GROUP CHAT ----------------------------------------------------------------------
 
+      // TODO: What to do when this is a normal chat misidentified as a group chat?
+      // TODO: ADd button that analyzes as normal chat with the first two names
+
       // Show Error four Groups
-      document.getElementById('groups').innerHTML = "";
       var div = document.createElement('div');
       div.className = 'col-sm';
-      div.innerHTML = "<p>If you get this error even though this is no group chat you have probably copy-pased a chat in your chat. Trying to analyze for these two people.</p>" +
-                        userStruct[0].name+userStruct[1].name;
+      div.innerHTML = "<p>If this is no group chat you have probably copy-pased a chat in your chat. Please open your chat file and eliminate the other people.</p>";
 
-      var erG = document.getElementById("groups");
+      var erG = document.getElementById("groupInfo");
       erG.appendChild(div);
       erG.style.display = "block";
 
-      // TODO: Add group support
-      userStruct = [userStruct[0],userStruct[1]];
-      displayContents(userStruct);
+      document.getElementById("group").style.display = "block";
+
+
+      displayGroup(userStruct);
     } else {
       // NORMAL CHAT ----------------------------------------------------------------------
-      displayContents(userStruct);
+      displayChat(userStruct);
+      document.getElementById("1on1chat").style.display = "block";
+      document.getElementById("groupTable").style.display = "none";
     }
 
     // CLEAN HTML -------------------------------------------------------------------------
@@ -112,122 +122,52 @@ function readSingleFile(e) {
   reader.readAsText(file);
 }
 
-// Display all data
-function displayContents(content) {
+// NOTE: this is the function that gets executed on normal chats
+// Display normal 1 on 1 chat data
+function displayChat(content) {
 
   // contents is an object: name, message, date, time
 
   // USER SPECIFIC  ------------------------------------------------------------------------------------
   var wordsPerMessage = [];
   var messagesCount = [0,0];
-  for (var i = 0; i < content.length; i++) {
+  for (var i = 0; i < 2; i++) {
     // message Count ----------------------------------------
     messagesCount[i] = content[i].message.length;
 
     // Words per message ------------------------------------
-    // returns [avergeWordsPerMessage,tolatWords];
+    // returns [avergeWordsPerMessage,tolalWords];
     wordsPerMessage[i] = calcWordsPerMessage(content[i].message);
 
     // Most used words --------------------------------------
-    var Words = getWordCount(content[i].message);
-
-    var sentPicsIndex = [-1,-1];
-    var sentAudioIndex = [-1,-1];
-    var sentAudioCount = [0,0];
-    var sentPicsCount = [0,0];
-
-    // create &sort most Used array
-    mostUsed = [["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
-                      ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
-                      ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],];
-    var size = 0;
-    for (var key in Words) {
-      if (Words.hasOwnProperty(key)) size++;
-    }
-    for (var key in Words) {
-        if (Words.hasOwnProperty(key)) {
-          // evaluate the rest
-          for (var j = 0; j < size; j++) {
-            if (Words[key] > mostUsed[j][1]){
-              mostUsed.splice( j, 0, [key, Words[key]]);
-              break;
-            }
-          }
-        }
-    }
-
-    // evaluate how many pics were sent
-    for (var j = 0; j < mostUsed.length; j++) {
-      for (var k = 0; k < str4Pic.length; k++) {
-        if (mostUsed[j][0] == str4Pic[k]) {
-          sentPicsIndex[i] = j;
-          sentPicsCount[i] = mostUsed[j][1];
-          break;
-        }
-      }
-    }
-    // remove it from the array
-    mostUsed.splice(sentPicsIndex[i], 1);
-
-    // --  evaluate how many audio files were sent
-    for (var j = 0; j < mostUsed.length; j++) {
-      for (var k = 0; k < str4Audio.length; k++) {
-        if (mostUsed[j][0] == str4Audio[k]) {
-          sentAudioIndex[i] = j;
-          sentAudioCount[i] = mostUsed[j][1];
-          break;
-        }
-      }
-    }
-    // remove it from array
-    mostUsed.splice(sentAudioIndex[i], 1);
-
-    // remove all unwanted words
-    var id = 0
-    var indexToDel = [];
-    for (var j = 0; j < mostUsed.length; j++) {
-      for (var k = 0; k < unwantedWords.length; k++) {
-        if (mostUsed[j][0] == unwantedWords[k]) {
-          indexToDel[id] = j;
-          id++;
-        }
-      }
-    }
-    id = 0;
-    for (var j = 0; j < indexToDel.length; j++) {
-      mostUsed.splice(indexToDel[j]-id, 1);
-      id++;
-    }
+    var words = getMostUsedWords(content[i].message)
+    var mostUsed = words.mostUsed;
+    var sentPicsCount = words.sentPicsCount;
+    var sentAudioCount = words.sentAudioCount;
 
 
     // HTML CONSTRUCTION ------------------------------------
-    var mostUsedHTML ="";
-    //console.log(wordsPerMessage[i][1]);
     if (mostUsed.length > 29) {
       max = 30;
     } else {
       max = mostUsed.length;
     }
 
+    var mostUsedHTML ="";
     for (var j = 0; j < max; j++) {
       mostUsedHTML = mostUsedHTML + "<p>" + mostUsed[j][0].substring(1) +" - "+ Math.round(mostUsed[j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
     }
     var btn = "<button type='button' class='btn' data-toggle='collapse' data-target='#mostUsed"+i+"''>" +
               "<i class='fas fa-chevron-down'></i></button>";
 
-
-    // clear data from previous analyzations
-    if (i == 0) {
-      document.getElementById('users').innerHTML = "";
-    }
     var div = document.createElement('div');
     div.className = 'col-sm';
     div.innerHTML = "<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>" +
                     "<h4>" + content[i].name + "</h4>" +
                     "<p> Messages sent: <b>" + messagesCount[i] + "</b></p>" +
                     "<p> Words per Message: <b>" + wordsPerMessage[i][0] + "</b></p>" +
-                    "<p> Pictures sent: <b>" + sentPicsCount[i] + "</b></p>" +
-                    //"<p> Audio sent:" + sentAudioCount[i] + "</p>" +
+                    "<p> Pictures sent: <b>" + sentPicsCount + "</b></p>" +
+                    "<p> Audio sent:<b>" + sentAudioCount + "</b></p>" +
                     "<p>"+ btn + "<b> Most used words:</b></p>"+
                     "<div id='mostUsed"+i+"' class='collapse in'>" + mostUsedHTML + "</div>";
     document.getElementById('users').appendChild(div);
@@ -521,7 +461,7 @@ function displayContents(content) {
                   "<p>" + "Overall " + content[n0].name +" writes <b>" + percent + "</p>";
   document.getElementById('usersRows').appendChild(div);
 
-  // CHRONOLOGICAL WORDS PER MESSAGE ------------------------------------------------------------------------
+  // CHRONOLOGICAL WORDS PER MESSAGE -----------------------------------------------------------------------
   //messages[i].trim().split(/\s+/).length;
   /*
   var ctx = document.getElementById('chronologicalGraph2').getContext('2d');
@@ -588,9 +528,73 @@ function displayContents(content) {
   var chart = new Chart(ctx, cfg);
 */
   // show chat of clicked day ------------------------------------------------
+}
+
+// NOTE: this is the function that gets executed on group chats
+function displayGroup(content) {
+var wordsPerMessage = [];
+var messagesCount = [];
+// personal STATS
+for (var i = 0; i < content.length; i++) {
+  // message Count ----------------------------------------
+  messagesCount[i] = content[i].message.length;
+
+  // Words per message ------------------------------------
+  // returns [avergeWordsPerMessage,tolalWords];
+  wordsPerMessage[i] = calcWordsPerMessage(content[i].message);
+
+  // Most used words --------------------------------------
+  var words = getMostUsedWords(content[i].message)
+  var mostUsed = words.mostUsed;
+  var sentPicsCount = words.sentPicsCount;
+  var sentAudioCount = words.sentAudioCount;
+
+  // HTML
+
+  // display table
+  document.getElementById("groupTable").style.display = "block";
+
+  // set max
+  if (mostUsed.length > 3) {
+    var max = 3;
+  } else {
+    var max = mostUsed.length;
+  }
+  var mostUsedHTML ="";
+  for (var j = 0; j < max; j++) {
+    mostUsedHTML = mostUsedHTML + mostUsed[j][0].substring(1) +" - "; //+ Math.round(mostUsed[j][1]/wordsPerMessage[i][1]*1000)/10 + "% | ";
+  }
+
+  // create rows
+  var tableRows = document.createElement('tr');
+
+  if (sentPicsCount == 0) {
+    sentPicsCount = "";
+  }
+  if (sentAudioCount == 0) {
+    sentAudioCount = "";
+  }
+
+  tableRows.innerHTML = "<th scope='row'>"+"<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>"+"</th>" +
+                        "<td>"+content[i].name+"</td>" +
+                        "<td>"+messagesCount[i]+"</td>" +
+                        "<td>"+wordsPerMessage[i][0]+"</td>"+
+                        "<td>"+sentPicsCount+"</td>" +
+                        "<td>"+sentAudioCount+"</td>" +
+                        "<td>"+mostUsedHTML+"</td>";
+
+  document.getElementById('groupTableRows').appendChild(tableRows);
+
 
 }
 
+// sort table by most messages
+sortTable(1);
+
+
+}
+
+// FUNCTIONS ----------------- ------ ------ ------ ------
 
 // struct factory
 // https://stackoverflow.com/questions/502366/structs-in-javascript
@@ -614,6 +618,8 @@ function createStruct(content) {
    // https://www.debuggex.com/r/G5iGDvohGF8krt8Y
    // This regex is used to find the start index of every message (including special messages)
    var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\s.{1,3}\\s|\\s)|,\\s|\\.\\s){1}(((\\d{1,2}\\:)\\d{2}(:\\d{2})?)(\\s(a|p)?m|\\s(A|P)?M|\\s(a|p)?\\.\\s\\m\.)?)(\\]\\s|\\s\\-\\s|\\:)","g");
+   // regex to find ending of name
+   // var reD = new RegExp("([:-])");
    var reD = new RegExp("(:)");
 
    var indexArray = [];
@@ -647,30 +653,23 @@ function createStruct(content) {
         temp = content.substring(indexArray[i]+messageStartIndexArray[i], indexArray[i+1]);
       }
 
+      // search for a name and add it's length to the index
       match = reD.exec(temp);
       if (match != null) {
         nameLengthArray[i] = match.index ;
+        // update name
         nameArray[i] = temp.substring(0,match.index);
       } else {
         nameLengthArray[i] = 0 ;
+        // update name
         nameArray[i] = "ER: NO NAME FOUND";
       }
-      // search for a name and add it's length to the index
-      /*
-      if (temp.indexOf(":") > 0) {
-        // if we find a name add the index of the seperator
-        messageStartIndexArray[i] = messageStartIndexArray[i] + temp.indexOf(":") ;
-        // update name
-        nameArray[i] = temp.substring(temp.indexOf(":"),messageStartIndexArray);
-      } else {
-        nameArray[i] = "ER: NO NAME FOUND";
-      }*/
 
-      // fill array
+      // fill array // +2 gets rid of ": " before the start of the message
       if (i == indexArray.length - 1) {
-        messageArray[i] = content.substring(indexArray[i]+messageStartIndexArray[i]+nameLengthArray[i], content.length);
+        messageArray[i] = content.substring(indexArray[i]+messageStartIndexArray[i]+nameLengthArray[i]+2, content.length);
       } else {
-        messageArray[i] = content.substring(indexArray[i]+messageStartIndexArray[i]+nameLengthArray[i], indexArray[i+1]);
+        messageArray[i] = content.substring(indexArray[i]+messageStartIndexArray[i]+nameLengthArray[i]+2, indexArray[i+1]);
       }
     }
 
@@ -858,6 +857,100 @@ function addMissingDays(data) {
 
 // ----- ---- ---- PERSONAL STATS -------------------- //
 
+
+// returns an orderd struct with words and how often they are used
+function getMostUsedWords(messages) {
+
+  // Most used words --------------------------------------
+  var Words = getWordCount(messages);
+
+  var sentPicsIndex = -1;
+  var sentAudioIndex = -1;
+  var sentAudioCount = 0;
+  var sentPicsCount = 0;
+  // create &sort most Used array
+  mostUsed = [["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
+                    ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
+                    ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],];
+  var size = 0;
+  for (var key in Words) {
+    if (Words.hasOwnProperty(key)) size++;
+  }
+  for (var key in Words) {
+      if (Words.hasOwnProperty(key)) {
+        // evaluate the rest
+        for (var j = 0; j < size; j++) {
+          if (Words[key] > mostUsed[j][1]){
+            mostUsed.splice( j, 0, [key, Words[key]]);
+            break;
+          }
+        }
+      }
+  }
+
+  // evaluate how many pics were sent
+  for (var j = 0; j < mostUsed.length; j++) {
+    for (var k = 0; k < str4Pic.length; k++) {
+      if (mostUsed[j][0] == str4Pic[k]) {
+        sentPicsIndex = j;
+        sentPicsCount = mostUsed[j][1];
+        break;
+      }
+    }
+  }
+  // remove it from the array
+  mostUsed.splice(sentPicsIndex, 1);
+
+  // --  evaluate how many audio files were sent
+  for (var j = 0; j < mostUsed.length; j++) {
+    for (var k = 0; k < str4Audio.length; k++) {
+      if (mostUsed[j][0] == str4Audio[k]) {
+        sentAudioIndex = j;
+        sentAudioCount = mostUsed[j][1];
+        break;
+      }
+    }
+  }
+  // remove it from array
+  mostUsed.splice(sentAudioIndex, 1);
+
+  // remove all unwanted words
+  var id = 0
+  var indexToDel = [];
+  for (var j = 0; j < mostUsed.length; j++) {
+    for (var k = 0; k < unwantedWords.length; k++) {
+      if (mostUsed[j][0] == unwantedWords[k]) {
+        indexToDel[id] = j;
+        id++;
+      }
+    }
+  }
+  id = 0;
+
+  for (var j = 0; j < indexToDel.length; j++) {
+    mostUsed.splice(indexToDel[j]-id, 1);
+    id++;
+  }
+
+  return { mostUsed: mostUsed,
+          sentPicsCount: sentPicsCount,
+          sentAudioCount: sentAudioCount
+          };
+}
+
+// helper function to count words
+// thanks to https://stackoverflow.com/a/6565353/7151828
+function getWordCount(messages) {
+  var wordCounts = { };
+  var words = messages.join(" ").split(/[\b\s(?:,| )+]/);
+
+  for (var i = 0; i < words.length; i++) {
+    wordCounts["_" + words[i].toLowerCase()] = (wordCounts["_" + words[i].toLowerCase()] || 0) + 1;
+  }
+  //console.log(wordCounts);
+  return wordCounts;
+}
+
 // activity by day of week
 function getMessagesPerDay(dates) {
   var dayCount = [0,0,0,0,0,0,0];
@@ -871,9 +964,7 @@ function getMessagesPerDay(dates) {
 
   return dayCount;
 }
-
 // activity by time
-// returns struct "date count indexStart"
 function countMessages(dates) {
   // init
   var date = [];
@@ -913,21 +1004,6 @@ function countMessages(dates) {
 
 // activity by hour
 
-// count words per person
-
-// counts how often you use every word
-// thanks to https://stackoverflow.com/a/6565353/7151828
-function getWordCount(messages) {
-    var wordCounts = { };
-    var words = messages.join(" ").split(/[\b\s(?:,| )+]/);
-
-  for (var i = 0; i < words.length; i++) {
-    wordCounts["_" + words[i].toLowerCase()] = (wordCounts["_" + words[i].toLowerCase()] || 0) + 1;
-  }
-  //console.log(wordCounts);
-  return wordCounts;
-}
-
 // 30 most used emoji per person
 
 // ---- ---- ---- TOTAL STATS
@@ -942,3 +1018,72 @@ function calcWordsPerMessage(messages) {
 }
 
 // average messages per day
+
+// --- TABEL SORTER
+
+function sortTable(n) {
+  var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+  table = document.getElementById("myTable");
+  switching = true;
+  //Set the sorting direction to ascending:
+  dir = "desc";
+  /*Make a loop that will continue until
+  no switching has been done:*/
+  while (switching) {
+    //start by saying: no switching is done:
+    switching = false;
+    rows = table.getElementsByTagName("TR");
+    /*Loop through all table rows (except the
+    first, which contains table headers):*/
+    for (i = 1; i < (rows.length - 1); i++) {
+      //start by saying there should be no switching:
+      shouldSwitch = false;
+      /*Get the two elements you want to compare,
+      one from current row and one from the next:*/
+      x = rows[i].getElementsByTagName("TD")[n];
+      y = rows[i + 1].getElementsByTagName("TD")[n];
+
+      if (x.innerHTML == "") {
+        x = "0";
+      } else {
+        x = parseFloat(x.innerHTML);
+      }
+      if (y.innerHTML == "") {
+        y = "0";
+      } else {
+        y = parseFloat(y.innerHTML);
+      }
+
+      /*check if the two rows should switch place,
+      based on the direction, asc or desc:*/
+      if (dir == "asc") {
+        if (x > y) {
+          //if so, mark as a switch and break the loop:
+          shouldSwitch= true;
+          break;
+        }
+      } else if (dir == "desc") {
+        if (x < y) {
+          //if so, mark as a switch and break the loop:
+          shouldSwitch= true;
+          break;
+        }
+      }
+    }
+    if (shouldSwitch) {
+      /*If a switch has been marked, make the switch
+      and mark that a switch has been done:*/
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+      //Each time a switch is done, increase this count by 1:
+      switchcount ++;
+    } else {
+      /*If no switching has been done AND the direction is "asc",
+      set the direction to "desc" and run the while loop again.*/
+      if (switchcount == 0 && dir == "desc") {
+        dir = "asc";
+        switching = true;
+      }
+    }
+  }
+}

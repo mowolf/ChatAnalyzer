@@ -55,7 +55,7 @@
           <div class="container error" id="error">
             <h2>Please unzip your file! Only .txt supported!</h2>
           </div>
-          <div class="container groups" id="groups">
+          <div class="container groups" id="groupInfo">
             <h2>Was this a group chat?</h2>
           </div>
           <div class="container loading text-center pt-1" id="loading">
@@ -71,66 +71,29 @@
     </header>
 
     <!-- feedback form --->
-          <div id="feedback">
-            <div id="feedback-form" style='display:none;background:white;' class="col-xs-4 panel panel-default">
+    <div id="feedback">
+      <div id="feedback-form" style='display:none;background:white;' class="col-xs-4 panel panel-default">
 
-              <form role="form" method="post" id="reused_form" class="form panel-body pt-1">
-                <!--  <div class="row">
-                      <div class="col-sm-12 form-group">
-                          <label>How do you rate your overall experience?</label>
-                          <p>
-                              <label class="radio-inline">
-                                  <input type="radio" name="experience" id="radio_experience" value="bad" >
-                                  <i class="fa fa-frown-o fa-2x" aria-hidden="true"></i> Bad
-                              </label>
-                              <label class="radio-inline">
-                                  <input type="radio" name="experience" id="radio_experience" value="average" >
-                                  <i class="fa fa-meh-o fa-2x" aria-hidden="true"></i> Just OK
-                              </label>
-                              <label class="radio-inline">
-                                  <input type="radio" name="experience" id="radio_experience" value="good" >
-                                  <i class="fa fa-smile-o fa-2x" aria-hidden="true"></i> Good
-                              </label>
-                          </p>
-                      </div>
-                  </div>-->
-
-                      <div class="form-group">
-                          <label for="comments"> Comments:</label>
-                          <textarea class="form-control" type="textarea" id="comments" placeholder="Please provide your data format: e.g. dd:mm:yy hh:mm:ss name: text" name="comments" maxlength="6000"></textarea>
-                      </div>
-
-
-                      <div class="form-group">
-                          <label for="email"> Email:</label>
-                          <input type="email" class="form-control" placeholder="e-mail" id="email" name="email" required>
-                      </div>
-
-                      <div class="form-group">
-                          <button type="submit" class="btn btn-lg btn-warning pull-right pb-2 mb-2" iaria-hidden="true"></i>Send</button>
-                      </div>
-
-              </form>
-              <div id="success_message" style="width:100%; height:100%; display:none; "> <h3 class="text-secondary text-center pt-3">Posted your feedback successfully!</h3> </div>
-              <div id="error_message" style="width:100%; height:100%; display:none; "> <h3 class="text-secondary text-center">Error</h3> Sorry there was an error sending your form. </div>
-
-
-              <!--
-              <form method="POST" action="" class="form panel-body pt-2" role="form">
-                <div class="form-group">
-                  <input class="form-control" name="email" autofocus placeholder="Your e-mail" type="email" />
-                </div>
-                <div class="form-group">
-                  <textarea class="form-control" name="body" required placeholder="Please write your feedback here..." rows="5"></textarea>
-                </div>
-                <button class="btn btn-primary pull-right pb-2" type="submit">Send</button>
-              </form>
-            -->
+        <form role="form" method="post" id="reused_form" class="form panel-body pt-1">
+            <div class="form-group">
+                <label for="comments"> Comments:</label>
+                <textarea class="form-control" type="textarea" id="comments" placeholder="Please provide your data format: e.g. dd:mm:yy hh:mm:ss name: text" name="comments" maxlength="6000"></textarea>
             </div>
-            <div id="feedback-tab">Feedback</div>
-          </div>
+            <div class="form-group">
+                <label for="email"> Email:</label>
+                <input type="email" class="form-control" placeholder="e-mail" id="email" name="email" required>
+            </div>
 
+            <div class="form-group">
+                <button type="submit" class="btn btn-lg btn-warning pull-right pb-2 mb-2" iaria-hidden="true"></i>Send</button>
+            </div>
+        </form>
+        <div id="success_message" style="width:100%; height:100%; display:none; "> <h3 class="text-secondary text-center pt-3">Posted your feedback successfully!</h3> </div>
+        <div id="error_message" style="width:100%; height:100%; display:none; "> <h3 class="text-secondary text-center">Error</h3> Sorry there was an error sending your form. </div>
 
+      </div>
+      <div id="feedback-tab">Feedback</div>
+    </div>
 
     <!-- Tutorial -->
     <section class="tutorial pt-5" id="tutorial">
@@ -140,6 +103,7 @@
         <hr class="star-dark mb-5">
 
         <h5 class="text-center text-secondary"> Please export your WhatsApp chat history and select the .txt file when clicking on the button above.</h5>
+
       <div class="row">
 
         <div class="col-md-4 offset-md-4 ">
@@ -161,33 +125,45 @@
           </div>
           <h5 class="col-md-6 offset-md-3 text-center">If it does not work make sure to disable extentions like uBlock (or visit this site in incognito mode)!!</h5>
 
-
-
         </div>
         <hr class="style1">
         <h2 class="text-center text-uppercase text-secondary pt-4 mb-0">Example</h2>
-        <!-- TODO: Make image responsive -->
         <div>
           <img src="img/example.png" class="img-fluid" alt="example">
         </div>
       </div>
-
-
       </div>
     </section>
-    <!-- Portfolio Grid Section -->
+
+    <!-- results -->
     <section class="results" id="results">
 
       <div class="container">
         <h2 class="text-center text-uppercase text-secondary mb-0">Results</h2>
         <hr class="star-dark mb-5">
 
-          <div class="row text-center" id="users">
-            <!-- colums USER DATA -->
+
+        <div id="group">
+          <div class="text-center" id="groupTable">
+            <!-- individual Group DATA -->
+            <table class="table table-hover" id="myTable">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Name</th>
+                  <th scope="col" onclick="sortTable(1)">Messages</th>
+                  <th scope="col" onclick="sortTable(2)">Words per Message</th>
+                  <th scope="col" onclick="sortTable(3)">Sent Pics</th>
+                  <th scope="col" onclick="sortTable(4)">Sent Audio</th>
+                  <th scope="col">Most Used Words</th>
+                </tr>
+              </thead>
+
+              <tbody id="groupTableRows">
+              </tbody>
+            </table>
           </div>
-
-
-
+        </div>
 
           <!-- Words per user -->
           <!--
@@ -195,21 +171,28 @@
             <canvas id="barWords"></canvas>
           </div>
           -->
+          <div id="1on1chat">
 
-          <div class="text-center pt-3 pb-2 userRows text-white" id="usersRows">
-            <!-- colums USER DATA -->
+            <div class="row text-center" id="users">
+              <!-- individual USER DATA -->
+            </div>
+
+            <div class="text-center pt-3 pb-2 userRows text-white" id="usersRows">
+              <!-- colums USER DATA -->
+            </div>
+
+            <!-- Messages per day -->
+            <h2 class="text-center text-uppercase text-secondary mb-0 mt-5 pb-2 pt-2">Messages per Weekday</h2>
+            <div class="row pt-4">
+              <canvas id="dayRadar"></canvas>
+            </div>
+            <!-- Chronological View -->
+            <h2 class="text-center text-uppercase text-secondary mb-0 mt-5 pb-2 pt-3">Chronological Graph</h2>
+            <div class="row pt-4">
+              <canvas id="chronologicalGraph"></canvas>
+            </div>
           </div>
 
-          <!-- Messages per day -->
-          <h2 class="text-center text-uppercase text-secondary mb-0 mt-5 pb-2 pt-2">Messages per Weekday</h2>
-          <div class="row pt-4">
-            <canvas id="dayRadar"></canvas>
-          </div>
-          <!-- Chronological View -->
-          <h2 class="text-center text-uppercase text-secondary mb-0 mt-5 pb-2 pt-3">Chronological Graph</h2>
-          <div class="row pt-4">
-            <canvas id="chronologicalGraph"></canvas>
-          </div>
           <!-- Chronological View -->
           <!--
           <h2 class="text-center text-uppercase text-secondary mb-0 mt-5 pb-2 pt-5">Chronological Graph</h2>
@@ -217,10 +200,7 @@
             <canvas id="chronologicalGraph2"></canvas>
           </div>
         -->
-
-
       </div>
-
     </section>
 
     <!-- Footer -->
@@ -266,6 +246,7 @@
       </div>
     </footer>
 
+    <!-- Copyright -->
     <div class="copyright py-4 text-center text-white">
       <div class="container">
         <small>WhatsApp is a registered trademark of WhatsApp Inc. This site and service are not related in any way to WhatsApp Inc.</small>
@@ -296,9 +277,9 @@
     <!-- My own scripts to analyze the chat file -->
     <script src="js/analyze.js"></script>
 
-
-    <!-- Add SumoMe -->
+    <!-- SumoMe -->
     <script async>(function(s,u,m,o,j,v){j=u.createElement(m);v=u.getElementsByTagName(m)[0];j.async=1;j.src=o;j.dataset.sumoSiteId='3a188d739b5f8db07e60404f9b3a748f7e5664c60b71d9a9760bdfed904c77d3';v.parentNode.insertBefore(j,v)})(window,document,'script','//load.sumo.com/');</script>
+
   </body>
 
 </html>
