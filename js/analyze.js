@@ -592,7 +592,7 @@ function createStruct(content) {
    // REGEX
    // https://www.debuggex.com/r/G5iGDvohGF8krt8Y
    // This regex is used to find the start index of every message (including special messages)
-   var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\s.{1,3}\\s|\\s)|,\\s|\\.\\s){1}(((\\d{1,2}\\:)\\d{2}(:\\d{2})?)(\\s(a|p)?m|\\s(A|P)?M|\\s(a|p)?\\.\\s\\m\.)?)(\\]\\s|\\s\\-\\s|\\:)","g");
+   var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\s.{1,3}\\s|\\s)|,\\s|\\.\\s){1}(((\\d{1,2}\\:)\\d{2}(:\\d{2})?)(\\s(a|p)?m|\\s(A|P)?M|\\s(a|p)?\\.(\\s)?\\m\.)?)(\\]\\s|\\s\\-\\s|\\:)","g");
    // regex to find ending of name
    // var reD = new RegExp("([:-])");
    var reD = new RegExp("(:)");
