@@ -596,6 +596,7 @@ function createStruct(content) {
    // regex to find ending of name
    // var reD = new RegExp("([:-])");
    var reD = new RegExp("(:)");
+   var reS = new RegExp("(-)");
 
    var indexArray = [];
    var messageStartIndexArray = [];
@@ -630,15 +631,21 @@ function createStruct(content) {
 
       // search for a name and add it's length to the index
       match = reD.exec(temp);
+      var check = 0;
       if (match != null) {
         nameLengthArray[i] = match.index ;
         // update name
         nameArray[i] = temp.substring(0,match.index);
+        check++;
       } else {
         nameLengthArray[i] = 0 ;
         // update name
         nameArray[i] = "ER: NO NAME FOUND";
       }
+      if (nameArray > 2){
+
+      }
+
 
       // fill array // +2 gets rid of ": " before the start of the message
       if (i == indexArray.length - 1) {
