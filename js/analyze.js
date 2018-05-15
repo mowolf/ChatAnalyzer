@@ -12,7 +12,7 @@ var str4Audio = ["_<‎audio"];
 
 // If you notice words that are not part of your chat (i.g. identifiers) of your language in
 // ATTENTION: PLEASE BE SURE TO COPY AND PASTE FROM YOUR CHAT LOG !!!!
-var unwantedWords = ["_","_weggelassen>", "_ommited>"];
+var unwantedWords = ["_","_weggelassen>", "_ommited>", "omesso>"];
 
 /// ----------------------------- \ GENERAL Config END /--------------------------------
 
@@ -23,7 +23,7 @@ var unwantedWords = ["_","_weggelassen>", "_ommited>"];
 // TODO: Most used emojies
 
 /// ----------------------------- \ Code /--------------------------------------
-
+wordsByUsage = [];
 // file listener
 document.getElementById('file-input')
   .addEventListener('change', readSingleFile, false);
@@ -141,6 +141,7 @@ function displayChat(content) {
   // USER SPECIFIC  ------------------------------------------------------------------------------------
   var wordsPerMessage = [];
   var messagesCount = [0,0];
+
   for (var i = 0; i < 2; i++) {
     // message Count ----------------------------------------
     messagesCount[i] = content[i].message.length;
@@ -151,23 +152,37 @@ function displayChat(content) {
 
     // Most used words --------------------------------------
     var words = getMostUsedWords(content[i].message)
-    var mostUsed = words.mostUsed;
+    wordsByUsage[i] = words.mostUsed; // -> global variable
+
+    // TODO:make critical variables global! and be sure to save tmem and not override with new persons stat
+    totalWords = wordsPerMessage[i][1]
     var sentPicsCount = words.sentPicsCount;
     var sentAudioCount = words.sentAudioCount;
 
-
     // HTML CONSTRUCTION ------------------------------------
-    if (mostUsed.length > 29) {
+    if (wordsByUsage[i].length > 29) {
       max = 30;
     } else {
-      max = mostUsed.length;
+      max = wordsByUsage[i].length;
     }
 
     var mostUsedHTML ="";
     for (var j = 0; j < max; j++) {
-      mostUsedHTML = mostUsedHTML + "<p>" + mostUsed[j][0].substring(1) +" - "+ Math.round(mostUsed[j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
+      mostUsedHTML = mostUsedHTML + "<p>" + wordsByUsage[i][j][0].substring(1) +" - "+ Math.round(wordsByUsage[i][j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
     }
-    var btn = "<button type='button' class='btn' data-toggle='collapse' data-target='#mostUsed"+i+"''>" +
+
+
+    filterBtn = "<div class='btn-group'>" +
+                "<button class='btn btn-secondary btn-sm dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>" +
+                "Filter out stopwords" +
+                "</button>" +
+                "<button type='button' class='btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>" +
+                "<span class='sr-only'>Toggle Dropdown</span>" +
+                "</button>" +
+                "<div class='dropdown-menu' id='filter'>"+
+                "</div></div>";
+
+    var btn = "<button type='button' class='btn' data-toggle='collapse' data-target='#wordsByUsage"+i+"''>" +
               "<i class='fas fa-chevron-down'></i></button>";
 
     var div = document.createElement('div');
@@ -179,73 +194,44 @@ function displayChat(content) {
                     "<p> Pictures sent: <b>" + sentPicsCount + "</b></p>" +
                     "<p> Audio sent:<b>" + sentAudioCount + "</b></p>" +
                     "<p>"+ btn + "<b> Most used words:</b></p>"+
-                    "<div id='mostUsed"+i+"' class='collapse in'>" + mostUsedHTML + "</div>";
+                    "<div class='pb-1 mb-1'>" + filterBtn + "</div>" +
+                    "<div id='wordsByUsage"+i+"' class='collapse in'>" +  mostUsedHTML + "</div>";
     document.getElementById('users').appendChild(div);
+
+    // adds button to remove stopwords
+    // get languange names
+
+    var languageNames = ["Afar", "Afrikaans", "Akan", "Albanian", "Amharic", "Arabic", "Aragonese", "Armenian", "Assamese", "Avaric", "Avestan", "Aymara", "Azerbaijani", "Bambara", "Bashkir", "Basque", "Belarusian", "Bengali", "Bihari languages", "Bislama", "Bosnian", "Breton", "Bulgarian", "Burmese", "Catalan, Valencian", "Chamorro", "Chechen", "Chichewa, Chewa, Nyanja", "Chinese", "Chuvash", "Cornish", "Corsican", "Cree", "Croatian", "Czech", "Danish", "Divehi, Dhivehi, Maldivian", "Dutch, Flemish", "Dzongkha", "English", "Esperanto", "Estonian", "Ewe", "Faroese", "Fijian", "Filipino", "Finnish", "French", "Fulah", "Galician", "Georgian", "German", "Greek (modern)", "Guaraní", "Gujarati", "Haitian, Haitian Creole", "Hausa", "Hebrew (modern)", "Herero", "Hindi", "Hiri Motu", "Hungarian", "Interlingua", "Indonesian", "Interlingue", "Irish", "Igbo", "Inupiaq", "Ido", "Icelandic", "Italian", "Inuktitut", "Japanese", "Javanese", "Kalaallisut, Greenlandic", "Kannada", "Kanuri", "Kashmiri", "Kazakh", "Central Khmer", "Kikuyu, Gikuyu", "Kinyarwanda", "Kirghiz, Kyrgyz", "Komi", "Kongo", "Korean", "Kurdish", "Kuanyama, Kwanyama", "Latin", "Luxembourgish, Letzeburgesch", "Ganda", "Limburgan, Limburger, Limburgish", "Lingala", "Lao", "Lithuanian", "Luba-Katanga", "Latvian", "Manx", "Macedonian", "Malagasy", "Malay", "Malayalam", "Maltese", "Maori", "Marathi", "Marshallese", "Mongolian", "Nauru", "Navajo, Navaho", "North Ndebele", "Nepali", "Ndonga", "Norwegian Bokmål", "Norwegian Nynorsk", "Norwegian", "Sichuan Yi, Nuosu", "South Ndebele", "Occitan", "Ojibwa", "Church Slavic, Church Slavonic, Old Church Slavonic, Old Slavonic, Old Bulgarian", "Oromo", "Oriya", "Ossetian, Ossetic", "Panjabi, Punjabi", "Pali", "Persian", "Polish", "Pashto, Pushto", "Portuguese", "Quechua", "Romansh", "Rundi", "Romanian, Moldavian, Moldovan", "Russian", "Sanskrit", "Sardinian", "Sindhi", "Northern Sami", "Samoan", "Sango", "Serbian", "Gaelic, Scottish Gaelic", "Shona", "Sinhala, Sinhalese", "Slovak", "Slovenian", "Somali", "Southern Sotho", "Spanish, Castilian", "Sundanese", "Swahili", "Swati", "Swedish", "Tamil", "Telugu", "Tajik", "Thai", "Tigrinya", "Tibetan", "Turkmen", "Tagalog", "Tswana", "Tonga (Tonga Islands)", "Turkish", "Tsonga", "Tatar", "Twi", "Tahitian", "Uighur, Uyghur", "Ukrainian", "Urdu", "Uzbek", "Venda", "Vietnamese", "Volapük", "Walloon", "Welsh", "Wolof", "Western Frisian", "Xhosa", "Yiddish", "Yoruba", "Zhuang, Chuang", "Zulu"];
+
+    var lanCode = ["aa", "af", "ak", "sq", "am", "ar", "an", "hy", "as", "av", "ae", "ay", "az", "bm", "ba", "eu", "be", "bn", "bh", "bi", "bs", "br", "bg", "my", "ca", "ch", "ce", "ny", "zh", "cv", "kw", "co", "cr", "hr", "cs", "da", "dv", "nl", "dz", "en", "eo", "et", "ee", "fo", "fj", "fl", "fi", "fr", "ff", "gl", "ka", "de", "el", "gn", "gu", "ht", "ha", "he", "hz", "hi", "ho", "hu", "ia", "id", "ie", "ga", "ig", "ik", "io", "is", "it", "iu", "ja", "jv", "kl", "kn", "kr", "ks", "kk", "km", "ki", "rw", "ky", "kv", "kg", "ko", "ku", "kj", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "gv", "mk", "mg", "ms", "ml", "mt", "mi", "mr", "mh", "mn", "na", "nv", "nd", "ne", "ng", "nb", "nn", "no", "ii", "nr", "oc", "oj", "cu", "om", "or", "os", "pa", "pi", "fa", "pl", "ps", "pt", "qu", "rm", "rn", "ro", "ru", "sa", "sc", "sd", "se", "sm", "sg", "sr", "gd", "sn", "si", "sk", "sl", "so", "st", "es", "su", "sw", "ss", "sv", "ta", "te", "tg", "th", "ti", "bo", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "cy", "wo", "fy", "xh", "yi", "yo", "za", "zu"];
+
+    for (var key in stopwords) {
+      var lanName = String(key);
+      if (stopwords.hasOwnProperty(key)) {
+        for (var j = 0; j < lanCode.length; j++) {
+          if (String(key) == lanCode[j]) {
+            lanName = languageNames[j]
+            break;
+          }
+        }
+        //
+        var inputElement = document.createElement('a');
+        inputElement.className = "dropdown-item"
+        inputElement.value = key;
+        inputElement.innerHTML = lanName;
+        inputElement.addEventListener('click', function(){
+            removeStopwords(this.value)
+        });
+        document.getElementById('filter').appendChild(inputElement);
+      }
+    }
+
   }
 
   // TODO:words bar Graph
-  /*
-    for (var i = 0; i < 30; i++) {
-      barData = mostUsed[i][0];
-      barLabes = mostUsed[i][1];
-    }
-    new Chart(
-        document.getElementById("barWords"),
-        {
-        "type":"bar",
-        "data":{"labels":[ ['Monday', ''],"Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-        "datasets":[
-          {"label":barLabes,
-          "data":barData,
-          "fill":true,"backgroundColor":"rgba(20, 168, 204, 0.2)",
-          "borderColor":"rgb(20, 168, 204)",
-          "pointBackgroundColor":"rgb(20, 168, 204)",
-          "pointBorderColor":"#fff","pointHoverBackgroundColor":"#fff",
-          "pointHoverBorderColor":"rgb(20, 168, 204)"}],
-          options: {
-          legend: {
-            display: false
-        },
-        layout: {
-            padding: {
-              top: 20
-            }
-        },
-        showLabelsOnBars:true,
-        barLabelFontColor:"gray",
-        animation: {
-            duration: 0
-        },
-        scales: {
-            yAxes: [{
-                stacked: true,
-                display: false,
-                ticks: {
-                    beginAtZero:true
-                }
-            }],
-            xAxes: [{
-                stacked: true,
-                id:"ejeX",
-                ticks: {
-                    beginAtZero:true,
-                    fontSize: 30
-                    }}]
-            },
-            plugins: {
-                datalabels: {
-                  color: 'black',
-                  font: {size: 24},
-                    display: true
-                }
-            }
-        }
-        });
-  */
 
   // Messages per Day Radar -----------------------------------------------------------------------------
   createDayRadar(content);
-
 
   // CHRONOLOGICAL GRAPH --------------------------------------------------------------------------------
   // returns struct "date count indexStart"
@@ -253,145 +239,6 @@ function displayChat(content) {
   messageCount = [countMessages(content[0].date), countMessages(content[1].date)];
   formatedStruct = addMissingDays(messageCount);
 
-  /*
-  // better tooltips
-  Chart.defaults.global.pointHitDetectionRadius = 1;
-  var customTooltips = function(tooltip) {
-  			// Tooltip Element
-  			var tooltipEl = document.getElementById('chartjs-tooltip');
-
-  			if (!tooltipEl) {
-  				tooltipEl = document.createElement('div');
-  				tooltipEl.id = 'chartjs-tooltip';
-  				tooltipEl.innerHTML = '<table></table>';
-  				this._chart.canvas.parentNode.appendChild(tooltipEl);
-  			}
-
-  			// Hide if no tooltip
-  			if (tooltip.opacity === 0) {
-  				tooltipEl.style.opacity = 0;
-  				return;
-  			}
-
-  			// Set caret Position
-  			tooltipEl.classList.remove('above', 'below', 'no-transform');
-  			if (tooltip.yAlign) {
-  				tooltipEl.classList.add(tooltip.yAlign);
-  			} else {
-  				tooltipEl.classList.add('no-transform');
-  			}
-
-  			function getBody(bodyItem) {
-  				return bodyItem.lines;
-  			}
-
-  			// Set Text
-  			if (tooltip.body) {
-  				var titleLines = tooltip.title || [];
-  				var bodyLines = tooltip.body.map(getBody);
-
-  				var innerHtml = '<thead>';
-
-  				titleLines.forEach(function(title) {
-  					innerHtml += '<tr><th>' + title.substring(0,12) + '</th></tr>';
-            // the title is the date - we only want to show the day not the time
-  				});
-  				innerHtml += '</thead><tbody>';
-
-  				bodyLines.forEach(function(body, i) {
-  					var colors = tooltip.labelColors[i];
-  					var style = 'background:' + colors.backgroundColor;
-  					style += '; border-color:' + colors.borderColor;
-  					style += '; border-width: 2px';
-  					var span = '<span class="chartjs-tooltip-key" style="' + style + '"></span>';
-  					innerHtml += '<tr><td>' +span + body + '</td></tr>';
-            // body is NAME: Count
-  				});
-  				innerHtml += '</tbody>';
-
-  				var tableRoot = tooltipEl.querySelector('table');
-  				tableRoot.innerHTML = innerHtml;
-  			}
-
-  			var positionY = this._chart.canvas.offsetTop;
-  			var positionX = this._chart.canvas.offsetLeft;
-
-  			// Display, position, and set styles for font
-  			tooltipEl.style.opacity = 1;
-  			tooltipEl.style.left = positionX + tooltip.caretX + 'px';
-  			tooltipEl.style.top = positionY + tooltip.caretY + 'px';
-  			tooltipEl.style.fontFamily = tooltip._bodyFontFamily;
-  			tooltipEl.style.fontSize = tooltip.bodyFontSize + 'px';
-  			tooltipEl.style.fontStyle = tooltip._bodyFontStyle;
-  			tooltipEl.style.padding = tooltip.yPadding + 'px ' + tooltip.xPadding + 'px';
-  		};
-  // graph
-  var ctx = document.getElementById('chronologicalGraph').getContext('2d');
-  ctx.canvas.width = 1400;
-  ctx.canvas.height = 500;
-  var cfg = {
-      type: 'line',
-      data: {
-      labels: formatedStruct[0].date,
-      datasets: [{
-        label: content[0].name,
-        data: formatedStruct[0].count,
-        type: 'line',
-        fill: true,
-        steppedLine: true,
-        pointRadius: 0,
-        lineTension: 0,
-        borderWidth: 1,
-        pointHoverRadius: 10,
-        backgroundColor:"rgba(20, 168, 204, 0.2)",
-        borderColor:"rgb(20, 168, 204)",
-        pointBackgroundColor:"rgb(20, 168, 204)",
-        pointBorderColor:"#fff",
-        pointHoverBackgroundColor:"#fff",
-        pointHoverBorderColor:"rgb(20, 168, 204)"},
-        {
-        label: content[1].name,
-        data: formatedStruct[1].count,
-        type: 'line',
-        fill: false,
-        steppedLine: true,
-        pointRadius: 0,
-        lineTension: 0,
-        borderWidth: 1,
-        pointHoverRadius: 10,
-        backgroundColor:"rgba(255, 72, 64, 0.2)",
-        borderColor:"rgb(255, 72, 64)",
-        pointBackgroundColor:"rgb(255, 72, 64)",
-        pointBorderColor:"#fff",
-        pointHoverBackgroundColor:"#fff",
-        pointHoverBorderColor:"rgb(255, 72, 64)"}]
-    },
-        options: {
-          scales: {
-            xAxes: [{
-              type: 'time',
-              distribution: 'linear',
-              time: {
-                    unit: 'year'
-              }
-            }],
-            yAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'Number Of Messages'
-              }
-            }]
-          },
-          tooltips: {
-						enabled: false,
-						mode: 'index',
-						position: 'nearest',
-						custom: customTooltips
-					}
-        }
-  };
-  var chart = new Chart(ctx, cfg);
-  */
 
   // GLOBAL FACTORS -----------------------------------------------------------------------------------
 
@@ -499,73 +346,72 @@ function displayChat(content) {
 // NOTE: this is the function that gets executed on group chats
 function displayGroup(content) {
 
-var wordsPerMessage = [];
-var messagesCount = [];
+  var wordsPerMessage = [];
+  var messagesCount = [];
 
-// TODO: figure out the group name!
+  // TODO: figure out the group name!
 
-// personal STATS
-for (var i = 0; i < content.length; i++) {
-  // message Count ----------------------------------------
-  messagesCount[i] = content[i].message.length;
+  // personal STATS
+  for (var i = 0; i < content.length; i++) {
+    // message Count ----------------------------------------
+    messagesCount[i] = content[i].message.length;
 
-  // Words per message ------------------------------------
-  // returns [avergeWordsPerMessage,tolalWords];
-  wordsPerMessage[i] = calcWordsPerMessage(content[i].message);
+    // Words per message ------------------------------------
+    // returns [avergeWordsPerMessage,tolalWords];
+    wordsPerMessage[i] = calcWordsPerMessage(content[i].message);
 
-  // Most used words --------------------------------------
-  var words = getMostUsedWords(content[i].message)
-  var mostUsed = words.mostUsed;
-  var sentPicsCount = words.sentPicsCount;
-  var sentAudioCount = words.sentAudioCount;
+    // Most used words --------------------------------------
+    var words = getMostUsedWords(content[i].message);
+    wordsByUsage[i] = words.mostUsed;
+    var sentPicsCount = words.sentPicsCount;
+    var sentAudioCount = words.sentAudioCount;
 
-  // HTML
+    // HTML
 
-  // display table
-  document.getElementById("groupTable").style.display = "block";
+    // display table
+    document.getElementById("groupTable").style.display = "block";
 
-  // set max
-  if (mostUsed.length > 3) {
-    var max = 3;
-  } else {
-    var max = mostUsed.length;
+    // set max
+    if (wordsByUsage[i].length > 3) {
+      var max = 3;
+    } else {
+      var max = wordsByUsage[i].length;
+    }
+    var mostUsedHTML ="";
+    for (var j = 0; j < max; j++) {
+      mostUsedHTML = mostUsedHTML + wordsByUsage[i][j][0].substring(1) +" - "; //+ Math.round(mostUsed[j][1]/wordsPerMessage[i][1]*1000)/10 + "% | ";
+    }
+
+    // create rows
+    var tableRows = document.createElement('tr');
+
+    if (sentPicsCount == 0) {
+      sentPicsCount = "";
+    }
+    if (sentAudioCount == 0) {
+      sentAudioCount = "";
+    }
+
+    tableRows.innerHTML = "<th scope='row'>"+"<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>"+"</th>" +
+                          "<td>"+content[i].name+"</td>" +
+                          "<td>"+messagesCount[i]+"</td>" +
+                          "<td>"+wordsPerMessage[i][0]+"</td>"+
+                          "<td>"+sentPicsCount+"</td>" +
+                          "<td>"+sentAudioCount+"</td>" +
+                          "<td>"+mostUsedHTML+"</td>";
+
+    document.getElementById('groupTableRows').appendChild(tableRows);
+
+
   }
-  var mostUsedHTML ="";
-  for (var j = 0; j < max; j++) {
-    mostUsedHTML = mostUsedHTML + mostUsed[j][0].substring(1) +" - "; //+ Math.round(mostUsed[j][1]/wordsPerMessage[i][1]*1000)/10 + "% | ";
-  }
 
-  // create rows
-  var tableRows = document.createElement('tr');
+  // sort table by most messages
+  sortTable(1);
 
-  if (sentPicsCount == 0) {
-    sentPicsCount = "";
-  }
-  if (sentAudioCount == 0) {
-    sentAudioCount = "";
-  }
-
-  tableRows.innerHTML = "<th scope='row'>"+"<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>"+"</th>" +
-                        "<td>"+content[i].name+"</td>" +
-                        "<td>"+messagesCount[i]+"</td>" +
-                        "<td>"+wordsPerMessage[i][0]+"</td>"+
-                        "<td>"+sentPicsCount+"</td>" +
-                        "<td>"+sentAudioCount+"</td>" +
-                        "<td>"+mostUsedHTML+"</td>";
-
-  document.getElementById('groupTableRows').appendChild(tableRows);
-
-
-}
-
-// sort table by most messages
-sortTable(1);
-
-// Day Radar
-createDayRadar(content);
-// Chronological Graph
-createChonologicalGraph(content);
-
+  // Day Radar
+  createDayRadar(content);
+  // Chronological Graph
+  createChonologicalGraph(content);
 }
 
 // # ------------------------------------------------------------------------- #
@@ -595,8 +441,7 @@ function createStruct(content) {
    var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\s.{1,3}\\s|\\s)|,\\s|\\.\\s){1}(((\\d{1,2}\\:)\\d{2}(:\\d{2})?)(\\s(a|p)?m|\\s(A|P)?M|\\s(a|p)?\\.(\\s)?\\m\.)?)(\\]\\s|\\s\\-\\s|\\:)","g");
    // regex to find ending of name
    // var reD = new RegExp("([:-])");
-   var reD = new RegExp("(:)");
-   var reS = new RegExp("(-)");
+   var reD = new RegExp("(:|-)");
 
    var indexArray = [];
    var messageStartIndexArray = [];
@@ -631,19 +476,15 @@ function createStruct(content) {
 
       // search for a name and add it's length to the index
       match = reD.exec(temp);
-      var check = 0;
+
       if (match != null) {
         nameLengthArray[i] = match.index ;
         // update name
         nameArray[i] = temp.substring(0,match.index);
-        check++;
       } else {
         nameLengthArray[i] = 0 ;
         // update name
         nameArray[i] = "ER: NO NAME FOUND";
-      }
-      if (nameArray > 2){
-
       }
 
 
@@ -848,7 +689,7 @@ function getMostUsedWords(messages) {
   var sentAudioCount = 0;
   var sentPicsCount = 0;
   // create &sort most Used array
-  mostUsed = [["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
+  var mostUsed = [["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
                     ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],
                     ["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],["",0],];
   var size = 0;
@@ -997,6 +838,50 @@ function calcWordsPerMessage(messages) {
 
 // TODO: average messages per day
 
+// remove stopwords
+function removeStopwords(lan) {
+
+  // Filter words
+  var Stopwords = stopwords[lan];
+  // save words in new variable
+  var filteredWords = $.extend(true,{},wordsByUsage);
+
+  // for all inputs
+  for (var i = 0; i < 2; i++) {
+
+    var delIndex = [];
+
+    var l = 0;
+    for (var j = 0; j < filteredWords[i].length; j++) {
+
+      if (Stopwords.indexOf(filteredWords[i][j][0].substring(1)) > -1) {
+        delIndex[l] = j;
+        l++;
+      }
+    }
+    for (var j = 0; j < delIndex.length; j++) {
+      filteredWords[i].splice(delIndex[j]-j,1);
+    }
+
+    // get element
+    div = document.getElementById("wordsByUsage"+i);
+    // remove old content
+    div.innerHTML = "";
+    // add new content
+    if (filteredWords[i].length > 29) {
+      max = 30;
+    } else {
+      max = filteredWords[i].length;
+    }
+    var mostUsedHTML ="";
+    for (var j = 0; j < max; j++) {
+      mostUsedHTML = mostUsedHTML + "<p>" + filteredWords[i][j][0].substring(1) +" - "+ Math.round(filteredWords[i][j][1]/totalWords*1000)/10 + "%</p>";
+    }
+    div.innerHTML = mostUsedHTML;
+
+  }
+
+}
 
 // TABLES ----------------------------------------------------------------------
 
@@ -1219,7 +1104,7 @@ function createChonologicalGraph(content) {
     }
   }
 
-var unit = "month";
+  var unit = "month";
   if (formatedStruct[index].date.length < 22) {
     unit = "day";
   } else if (formatedStruct[index].date.length < 33) {
