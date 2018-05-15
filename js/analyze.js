@@ -171,20 +171,6 @@ function displayChat(content) {
       mostUsedHTML = mostUsedHTML + "<p>" + wordsByUsage[i][j][0].substring(1) +" - "+ Math.round(wordsByUsage[i][j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
     }
 
-
-    filterBtn = "<div class='btn-group'>" +
-                "<button class='btn btn-secondary btn-sm dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>" +
-                "Filter out stopwords" +
-                "</button>" +
-                "<button type='button' class='btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>" +
-                "<span class='sr-only'>Toggle Dropdown</span>" +
-                "</button>" +
-                "<div class='dropdown-menu' id='filter'>"+
-                "</div></div>";
-
-    var btn = "<button type='button' class='btn' data-toggle='collapse' data-target='#wordsByUsage"+i+"''>" +
-              "<i class='fas fa-chevron-down'></i></button>";
-
     var div = document.createElement('div');
     div.className = 'col-sm';
     div.innerHTML = "<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>" +
@@ -192,41 +178,77 @@ function displayChat(content) {
                     "<p> Messages sent: <b>" + messagesCount[i] + "</b></p>" +
                     "<p> Words per Message: <b>" + wordsPerMessage[i][0] + "</b></p>" +
                     "<p> Pictures sent: <b>" + sentPicsCount + "</b></p>" +
-                    "<p> Audio sent:<b>" + sentAudioCount + "</b></p>" +
-                    "<p>"+ btn + "<b> Most used words:</b></p>"+
-                    "<div class='pb-1 mb-1'>" + filterBtn + "</div>" +
-                    "<div id='wordsByUsage"+i+"' class='collapse in'>" +  mostUsedHTML + "</div>";
+                    "<p> Audio sent:<b>" + sentAudioCount + "</b></p>";
     document.getElementById('users').appendChild(div);
 
-    // adds button to remove stopwords
-    // get languange names
-
-    var languageNames = ["Afar", "Afrikaans", "Akan", "Albanian", "Amharic", "Arabic", "Aragonese", "Armenian", "Assamese", "Avaric", "Avestan", "Aymara", "Azerbaijani", "Bambara", "Bashkir", "Basque", "Belarusian", "Bengali", "Bihari languages", "Bislama", "Bosnian", "Breton", "Bulgarian", "Burmese", "Catalan, Valencian", "Chamorro", "Chechen", "Chichewa, Chewa, Nyanja", "Chinese", "Chuvash", "Cornish", "Corsican", "Cree", "Croatian", "Czech", "Danish", "Divehi, Dhivehi, Maldivian", "Dutch, Flemish", "Dzongkha", "English", "Esperanto", "Estonian", "Ewe", "Faroese", "Fijian", "Filipino", "Finnish", "French", "Fulah", "Galician", "Georgian", "German", "Greek (modern)", "Guaraní", "Gujarati", "Haitian, Haitian Creole", "Hausa", "Hebrew (modern)", "Herero", "Hindi", "Hiri Motu", "Hungarian", "Interlingua", "Indonesian", "Interlingue", "Irish", "Igbo", "Inupiaq", "Ido", "Icelandic", "Italian", "Inuktitut", "Japanese", "Javanese", "Kalaallisut, Greenlandic", "Kannada", "Kanuri", "Kashmiri", "Kazakh", "Central Khmer", "Kikuyu, Gikuyu", "Kinyarwanda", "Kirghiz, Kyrgyz", "Komi", "Kongo", "Korean", "Kurdish", "Kuanyama, Kwanyama", "Latin", "Luxembourgish, Letzeburgesch", "Ganda", "Limburgan, Limburger, Limburgish", "Lingala", "Lao", "Lithuanian", "Luba-Katanga", "Latvian", "Manx", "Macedonian", "Malagasy", "Malay", "Malayalam", "Maltese", "Maori", "Marathi", "Marshallese", "Mongolian", "Nauru", "Navajo, Navaho", "North Ndebele", "Nepali", "Ndonga", "Norwegian Bokmål", "Norwegian Nynorsk", "Norwegian", "Sichuan Yi, Nuosu", "South Ndebele", "Occitan", "Ojibwa", "Church Slavic, Church Slavonic, Old Church Slavonic, Old Slavonic, Old Bulgarian", "Oromo", "Oriya", "Ossetian, Ossetic", "Panjabi, Punjabi", "Pali", "Persian", "Polish", "Pashto, Pushto", "Portuguese", "Quechua", "Romansh", "Rundi", "Romanian, Moldavian, Moldovan", "Russian", "Sanskrit", "Sardinian", "Sindhi", "Northern Sami", "Samoan", "Sango", "Serbian", "Gaelic, Scottish Gaelic", "Shona", "Sinhala, Sinhalese", "Slovak", "Slovenian", "Somali", "Southern Sotho", "Spanish, Castilian", "Sundanese", "Swahili", "Swati", "Swedish", "Tamil", "Telugu", "Tajik", "Thai", "Tigrinya", "Tibetan", "Turkmen", "Tagalog", "Tswana", "Tonga (Tonga Islands)", "Turkish", "Tsonga", "Tatar", "Twi", "Tahitian", "Uighur, Uyghur", "Ukrainian", "Urdu", "Uzbek", "Venda", "Vietnamese", "Volapük", "Walloon", "Welsh", "Wolof", "Western Frisian", "Xhosa", "Yiddish", "Yoruba", "Zhuang, Chuang", "Zulu"];
-
-    var lanCode = ["aa", "af", "ak", "sq", "am", "ar", "an", "hy", "as", "av", "ae", "ay", "az", "bm", "ba", "eu", "be", "bn", "bh", "bi", "bs", "br", "bg", "my", "ca", "ch", "ce", "ny", "zh", "cv", "kw", "co", "cr", "hr", "cs", "da", "dv", "nl", "dz", "en", "eo", "et", "ee", "fo", "fj", "fl", "fi", "fr", "ff", "gl", "ka", "de", "el", "gn", "gu", "ht", "ha", "he", "hz", "hi", "ho", "hu", "ia", "id", "ie", "ga", "ig", "ik", "io", "is", "it", "iu", "ja", "jv", "kl", "kn", "kr", "ks", "kk", "km", "ki", "rw", "ky", "kv", "kg", "ko", "ku", "kj", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "gv", "mk", "mg", "ms", "ml", "mt", "mi", "mr", "mh", "mn", "na", "nv", "nd", "ne", "ng", "nb", "nn", "no", "ii", "nr", "oc", "oj", "cu", "om", "or", "os", "pa", "pi", "fa", "pl", "ps", "pt", "qu", "rm", "rn", "ro", "ru", "sa", "sc", "sd", "se", "sm", "sg", "sr", "gd", "sn", "si", "sk", "sl", "so", "st", "es", "su", "sw", "ss", "sv", "ta", "te", "tg", "th", "ti", "bo", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "cy", "wo", "fy", "xh", "yi", "yo", "za", "zu"];
-
-    for (var key in stopwords) {
-      var lanName = String(key);
-      if (stopwords.hasOwnProperty(key)) {
-        for (var j = 0; j < lanCode.length; j++) {
-          if (String(key) == lanCode[j]) {
-            lanName = languageNames[j]
-            break;
-          }
-        }
-        //
-        var inputElement = document.createElement('a');
-        inputElement.className = "dropdown-item"
-        inputElement.value = key;
-        inputElement.innerHTML = lanName;
-        inputElement.addEventListener('click', function(){
-            removeStopwords(this.value)
-        });
-        document.getElementById('filter').appendChild(inputElement);
-      }
-    }
-
+    // add words
+    var div = document.createElement('div');
+    div.className = 'col-sm';
+    div.innerHTML = "<div id='wordsByUsage"+i+"'>" +  mostUsedHTML + "</div>"
+    document.getElementById('usersWords').appendChild(div);
   }
+
+  // Dropdown to remove stopwords
+  var languageNames = ["Afar", "Afrikaans", "Akan", "Albanian", "Amharic", "Arabic", "Aragonese", "Armenian", "Assamese", "Avaric", "Avestan", "Aymara", "Azerbaijani", "Bambara", "Bashkir", "Basque", "Belarusian", "Bengali", "Bihari languages", "Bislama", "Bosnian", "Breton", "Bulgarian", "Burmese", "Catalan, Valencian", "Chamorro", "Chechen", "Chichewa, Chewa, Nyanja", "Chinese", "Chuvash", "Cornish", "Corsican", "Cree", "Croatian", "Czech", "Danish", "Divehi, Dhivehi, Maldivian", "Dutch, Flemish", "Dzongkha", "English", "Esperanto", "Estonian", "Ewe", "Faroese", "Fijian", "Filipino", "Finnish", "French", "Fulah", "Galician", "Georgian", "German", "Greek (modern)", "Guaraní", "Gujarati", "Haitian, Haitian Creole", "Hausa", "Hebrew (modern)", "Herero", "Hindi", "Hiri Motu", "Hungarian", "Interlingua", "Indonesian", "Interlingue", "Irish", "Igbo", "Inupiaq", "Ido", "Icelandic", "Italian", "Inuktitut", "Japanese", "Javanese", "Kalaallisut, Greenlandic", "Kannada", "Kanuri", "Kashmiri", "Kazakh", "Central Khmer", "Kikuyu, Gikuyu", "Kinyarwanda", "Kirghiz, Kyrgyz", "Komi", "Kongo", "Korean", "Kurdish", "Kuanyama, Kwanyama", "Latin", "Luxembourgish, Letzeburgesch", "Ganda", "Limburgan, Limburger, Limburgish", "Lingala", "Lao", "Lithuanian", "Luba-Katanga", "Latvian", "Manx", "Macedonian", "Malagasy", "Malay", "Malayalam", "Maltese", "Maori", "Marathi", "Marshallese", "Mongolian", "Nauru", "Navajo, Navaho", "North Ndebele", "Nepali", "Ndonga", "Norwegian Bokmål", "Norwegian Nynorsk", "Norwegian", "Sichuan Yi, Nuosu", "South Ndebele", "Occitan", "Ojibwa", "Church Slavic, Church Slavonic, Old Church Slavonic, Old Slavonic, Old Bulgarian", "Oromo", "Oriya", "Ossetian, Ossetic", "Panjabi, Punjabi", "Pali", "Persian", "Polish", "Pashto, Pushto", "Portuguese", "Quechua", "Romansh", "Rundi", "Romanian, Moldavian, Moldovan", "Russian", "Sanskrit", "Sardinian", "Sindhi", "Northern Sami", "Samoan", "Sango", "Serbian", "Gaelic, Scottish Gaelic", "Shona", "Sinhala, Sinhalese", "Slovak", "Slovenian", "Somali", "Southern Sotho", "Spanish, Castilian", "Sundanese", "Swahili", "Swati", "Swedish", "Tamil", "Telugu", "Tajik", "Thai", "Tigrinya", "Tibetan", "Turkmen", "Tagalog", "Tswana", "Tonga (Tonga Islands)", "Turkish", "Tsonga", "Tatar", "Twi", "Tahitian", "Uighur, Uyghur", "Ukrainian", "Urdu", "Uzbek", "Venda", "Vietnamese", "Volapük", "Walloon", "Welsh", "Wolof", "Western Frisian", "Xhosa", "Yiddish", "Yoruba", "Zhuang, Chuang", "Zulu"];
+  var lanCode = ["aa", "af", "ak", "sq", "am", "ar", "an", "hy", "as", "av", "ae", "ay", "az", "bm", "ba", "eu", "be", "bn", "bh", "bi", "bs", "br", "bg", "my", "ca", "ch", "ce", "ny", "zh", "cv", "kw", "co", "cr", "hr", "cs", "da", "dv", "nl", "dz", "en", "eo", "et", "ee", "fo", "fj", "fl", "fi", "fr", "ff", "gl", "ka", "de", "el", "gn", "gu", "ht", "ha", "he", "hz", "hi", "ho", "hu", "ia", "id", "ie", "ga", "ig", "ik", "io", "is", "it", "iu", "ja", "jv", "kl", "kn", "kr", "ks", "kk", "km", "ki", "rw", "ky", "kv", "kg", "ko", "ku", "kj", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "gv", "mk", "mg", "ms", "ml", "mt", "mi", "mr", "mh", "mn", "na", "nv", "nd", "ne", "ng", "nb", "nn", "no", "ii", "nr", "oc", "oj", "cu", "om", "or", "os", "pa", "pi", "fa", "pl", "ps", "pt", "qu", "rm", "rn", "ro", "ru", "sa", "sc", "sd", "se", "sm", "sg", "sr", "gd", "sn", "si", "sk", "sl", "so", "st", "es", "su", "sw", "ss", "sv", "ta", "te", "tg", "th", "ti", "bo", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "cy", "wo", "fy", "xh", "yi", "yo", "za", "zu"];
+  // logic
+  var dropdownBtn = document.createDocumentFragment();
+  for (var key in stopwords) {
+    var lanName = String(key);
+    if (stopwords.hasOwnProperty(key)) {
+      for (var j = 0; j < lanCode.length; j++) {
+        if (String(key) == lanCode[j]) {
+          lanName = languageNames[j]
+          break;
+        }
+      }
+      //
+      var inputElement = document.createElement('a');
+      inputElement.className = "dropdown-item"
+      inputElement.value = key;
+      inputElement.innerHTML = lanName;
+      inputElement.addEventListener('click', function(){
+          removeStopwords(this.value)
+      });
+
+      dropdownBtn.appendChild(inputElement);
+    }
+  }
+  filterBtn = "<div class='btn-group' id='filterBtn'>" +
+              "<button class='btn btn-secondary btn-sm dropdown-toggle' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>" +
+              "Filter out stopwords" +
+              "</button>" +
+              "<div class='dropdown-menu' id='filter'>"+
+              "</div></div>";
+
+  // Collapse Btn
+  var collapseBtn = document.createElement('button');
+  collapseBtn.className = "dropdown-item"
+  collapseBtn.className = "btn";
+  collapseBtn.innerHTML = "<i class='fas fa-chevron-down'></i></button>";
+  collapseBtn.addEventListener('click', function(){
+      if (document.getElementById('usersWords').style.display == "none"){
+        document.getElementById('usersWords').style.display = "";
+        document.getElementById('filterBtn').style.display ="";
+      } else {
+        document.getElementById('usersWords').style.display = "none";
+        document.getElementById('filterBtn').style.display ="none";
+      }
+  });
+
+  //
+  var div = document.createElement('div');
+  div.className = 'mb-0';
+  div.innerHTML = "<p id='collapseBtnId'><b> Most used words:</b></p>"+
+                  "<div class='pb-1 mb-1'>" + filterBtn + "</div>";
+  // add to html
+  document.getElementById('mostUsedButtons').appendChild(div);
+  document.getElementById('collapseBtnId').insertBefore(collapseBtn, document.getElementById('collapseBtnId').firstChild);
+  document.getElementById('filter').appendChild(dropdownBtn);
+
+  // Hide them
+  document.getElementById('usersWords').style.display = "none";
+  document.getElementById('filterBtn').style.display ="none";
 
   // TODO:words bar Graph
 
