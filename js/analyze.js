@@ -52,6 +52,8 @@ function readSingleFile(e) {
   document.getElementById('users').innerHTML = "";
   document.getElementById('groupInfo').innerHTML = "";
   document.getElementById('usersRows').innerHTML = "";
+  document.getElementById('mostUsedButtons').innerHTML = "";
+  document.getElementById('usersWords').innerHTML = "";
 
   // hide Stuff
   document.getElementById("uBlock").style.display = "none";
@@ -645,6 +647,21 @@ function filterUsers(structArray) {
     userStruct.push(user);
   }
   // return
+
+  // remove users with less then 1 messages
+  // gets rid of chat bot : Messages to this chat and calls are now secured with end
+  var delUser = [];
+  for (var j = 0; j < userStruct.length; j++) {
+    if (userStruct[j].message.length < 2) {
+      delUser[j] = true;
+    }
+  }
+  for (var j = 0; j < delUser.length; j++) {
+    if (delUser[j]) {
+      userStruct.splice(j,1);
+    }
+  }
+
   return userStruct;
 }
 
