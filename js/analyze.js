@@ -175,7 +175,8 @@ function displayChat(content) {
 
     var div = document.createElement('div');
     div.className = 'col-sm';
-    div.innerHTML = "<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>" +
+    div.innerHTML = // "<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>" +
+                    "<h4 data-letters='" + content[i].name[0] + "'></h4>" +
                     "<h4>" + content[i].name + "</h4>" +
                     "<p> Messages sent: <b>" + messagesCount[i] + "</b></p>" +
                     "<p> Words per Message: <b>" + wordsPerMessage[i][0] + "</b></p>" +
@@ -416,7 +417,8 @@ function displayGroup(content) {
       sentAudioCount = "";
     }
 
-    tableRows.innerHTML = "<th scope='row'>"+"<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>"+"</th>" +
+    tableRows.innerHTML = //"<th scope='row'>"+"<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>"+"</th>" +
+                          "<th scope='row'>"+"<h4 data-letters='" + content[i].name[0] + "'></h4>"+"</th>" +
                           "<td>"+content[i].name+"</td>" +
                           "<td>"+messagesCount[i]+"</td>" +
                           "<td>"+wordsPerMessage[i][0]+"</td>"+
@@ -462,7 +464,7 @@ function createStruct(content) {
    // REGEX
    // https://www.debuggex.com/r/VGwUUxtq7tvF2rJB
    // This regex is used to find the start index of every message (including special messages)
-   var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\s.{1,3}\\s|\\s)|,\\s|\\.\\s){1}(((\\d{1,2}\\:)\\d{2}(:\\d{2})?)(\\s(a|p)?m|\\s(A|P)?M|\\s(a|p)?\\.(\\s)?\\m.)?)(\\]\\s|\\s\\-\\s|\\:)","g");
+   var re = new RegExp("(\\[?)((\\d{1,4}(\\-|\\/|\\.){1}){2}\\d{2,4})((\\s.{1,3}\\s|\\s)|,\\s|\\.\\s){1}(((\\d{1,2}(\\:|.))\\d{2}((:|.)\\d{2})?)(\\s(a|p)?m|\\s(A|P)?M|\\s(a|p)?\\.(\\s)?\\m.)?)(\\]\\s|\\s\\-\\s|\\:)","g");
    // regex to find ending of name
    // var reD = new RegExp("([:-])");
    var reD = new RegExp("(:|-)");
@@ -552,7 +554,7 @@ function filterUsers(structArray) {
   var userStruct = [];
 
   // regex
-  var reTime = new RegExp("((\\d{1,2})\:(\\d{1,2})((:)(\\d{1,2}))?)(\\s(a|p)?m|\\s(A|P)?M|\\s(a|p)?\\.\\s\m\\.)?");
+  var reTime = new RegExp("((\\d{1,2})(:|.)(\\d{1,2})((:|.)(\\d{1,2}))?)(\\s(a|p)?m|\\s(A|P)?M|\\s(a|p)?\\.\\s\m\\.)?");
   var reDate = new RegExp("((\\d{1,2})(\\-|\\/|\\.))((\\d{1,2})(\\-|\\/|\\.))(\\d{2,4})");
 
 
