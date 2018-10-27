@@ -40,7 +40,7 @@ Cheers! You are very welcome! Just submit a pull request. The goal of this tool 
 
 Please see the header of `analyze.js`. There you can add your identifiers.
 
-## Markov Chain
+### Markov Chain
 
 To generate text that sounds like you check here: https://github.com/mowolf/markov_chain_js/tree/master
 
