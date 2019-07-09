@@ -175,14 +175,14 @@ function displayChat(content) {
 
     var mostUsedHTML ="";
     for (var j = 0; j < max; j++) {
-      mostUsedHTML = mostUsedHTML + "<p>" + wordsByUsage[i][j][0].substring(1) +" - "+ Math.round(wordsByUsage[i][j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
+      mostUsedHTML = mostUsedHTML + "<p>" + escapeHTML(wordsByUsage[i][j][0].substring(1)) +" - "+ Math.round(wordsByUsage[i][j][1]/wordsPerMessage[i][1]*1000)/10 + "%</p>";
     }
 
     var div = document.createElement('div');
     div.className = 'col-sm';
     div.innerHTML = // "<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>" +
                     "<h4 data-letters='" + content[i].name[0] + "'></h4>" +
-                    "<h4>" + content[i].name + "</h4>" +
+                    "<h4>" + escapeHTML(content[i].name) + "</h4>" +
                     "<p> Messages sent: <b>" + messagesCount[i] + "</b></p>" +
                     "<p> Words per Message: <b>" + wordsPerMessage[i][0] + "</b></p>" +
                     "<p> Pictures sent: <b>" + sentPicsCount + "</b></p>" +
@@ -280,9 +280,12 @@ function displayChat(content) {
     var n1 = 0;
   }
 
+  var n0name = escapeHTML(content[n0].name);
+  var n1name = escapeHTML(content[n1].name);
+
   var factorF = Math.round((content[n0].message.length/content[n1].message.length)*100)/100;
   var wpmF = Math.round(wordsPerMessage[n0][0]/wordsPerMessage[n1][0]*100)/100;
-  var wpm = "And " + content[n0].name + " messages contain <b>" + wpmF + "</b> times the words of " +content[n1].name + " messages!</b>";
+  var wpm = "And " + n0name + " messages contain <b>" + wpmF + "</b> times the words of " +n1name + " messages!</b>";
   var percent = Math.round((wpmF)*factorF*100);
 
   if (percent >= 1) {
@@ -297,9 +300,9 @@ function displayChat(content) {
   var div = document.createElement('div');
   div.className = 'mb-0';
   div.innerHTML = "<p> You guys write an average of " +messPDA +" messages per day. That's "+ wordPDA + " words per day! </p>" +
-                  "<p>" + content[n0].name + " writes <b>" + factorF + "</b> times more messages!" + "</p>" +
+                  "<p>" + n0name + " writes <b>" + factorF + "</b> times more messages!" + "</p>" +
                   "<p>" + wpm + "</p>" +
-                  "<p>" + "Overall " + content[n0].name +" writes <b>" + percent + "</p>";
+                  "<p>" + "Overall " + n0name +" writes <b>" + percent + "</p>";
   document.getElementById('usersRows').appendChild(div);
 
   // TODO: CHRONOLOGICAL WORDS PER MESSAGE
@@ -424,12 +427,12 @@ function displayGroup(content) {
 
     tableRows.innerHTML = //"<th scope='row'>"+"<h4 data-letters='" + content[i].name.match(/\b\w/g).join('') + "'></h4>"+"</th>" +
                           "<th scope='row'>"+"<h4 data-letters='" + content[i].name[0] + "'></h4>"+"</th>" +
-                          "<td>"+content[i].name+"</td>" +
+                          "<td>"+escapeHTML(content[i].name)+"</td>" +
                           "<td>"+messagesCount[i]+"</td>" +
                           "<td>"+wordsPerMessage[i][0]+"</td>"+
                           "<td>"+sentPicsCount+"</td>" +
                           "<td>"+sentAudioCount+"</td>" +
-                          "<td>"+mostUsedHTML+"</td>";
+                          "<td>"+escapeHTML(mostUsedHTML)+"</td>";
 
     document.getElementById('groupTableRows').appendChild(tableRows);
 
@@ -927,6 +930,18 @@ function removeStopwords(lan) {
 
   }
 
+}
+
+function escapeHTML(text) {
+  var map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  var getReplacement = function(key) { return map[key]; } //The function's arg is the result of each match from the replace function
+  return text.replace(/[&<>"']/g, getReplacement);
 }
 
 // TABLES ----------------------------------------------------------------------

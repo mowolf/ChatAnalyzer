@@ -40,6 +40,10 @@ Cheers! You are very welcome! Just submit a pull request. The goal of this tool 
 
 Please see the header of `analyze.js`. There you can add your identifiers.
 
+### Markov Chain
+
+To generate text that sounds like you check here: https://github.com/mowolf/markov_chain_js/tree/master
+
 ### How the data is parsed & how you can build on that
 
 The chat data is parsed via regex and splitted into it's parts. There are two variables that hold the data.
