@@ -35,6 +35,8 @@
 
     <h5 class="text-center pt-2 text-secondary">No chat data is uploaded - works 100% offline - <a href="https://github.com/mowolf/ChatAnalyzer" target="_blank" class"text-small">Source Code <i class="fab fa-github"></i></a> </h5>
 
+
+
     <!-- Header -->
     <header class="masthead bg-primary text-white">
       <div class="container">
@@ -80,11 +82,11 @@
         <form role="form" method="post" id="reused_form" class="form panel-body pt-1">
             <div class="form-group">
                 <label for="comments"> Comments:</label>
-                <textarea class="form-control" type="textarea" id="comments" placeholder="Please provide your data format: e.g. dd:mm:yy hh:mm:ss name: text" name="comments" maxlength="6000"></textarea>
+                <textarea class="form-control" type="textarea" id="comments" placeholder="Any ideas? Missing something? Tool does not work?" name="comments" maxlength="6000"></textarea>
             </div>
             <div class="form-group">
                 <label for="email"> Email:</label>
-                <input type="email" class="form-control" placeholder="e-mail" id="email" name="email" required>
+                <input type="email" class="form-control" placeholder="Your e-mail" id="email" name="email" required>
             </div>
 
             <div class="form-group">
@@ -215,6 +217,79 @@
     </section>
 
     <!-- Footer -->
+
+    <section id="buy">
+      <div class="container text-center color-turquise">
+        <div class="mb-0 pt-4 pb-4">
+          <h4 class="text-uppercase mb-4">Download High-Res Image</h4>
+
+                <p> Please support the server costs if you liked the website! </p>
+
+                <!-- <button type="btm" class="btn btn-warning mt-2 mb-2" name="buy0" id="screenshot0"> <a>Download for free 🤑</a></button> -->
+
+                <button type="btm" class="btn btn-warning mt-2 mb-2" name="buy1" id="screenshot1">
+                <a>Download for 1.99 $ 💰</a></button>
+
+                <button type="btm" class="btn btn-warning mt-2 mb-2" name="buy2" id="screenshot2">
+                <a>Download for 4.99 $ 💰💰</a></button>
+
+                <button type="btm" class="btn btn-warning mt-2 mb-2" name="buy3" id="screenshot3">
+                <a>Download for 9.99 $ 💰💰💰</a></button>
+
+        </div>
+
+
+<!-- 1.99 -->
+<div id="one99">
+
+  <h4>Please click that button below. Once you paid the image should download.</h4>
+
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+  <input type="hidden" name="cmd" value="_s-xclick">
+  <input type="hidden" name="hosted_button_id" value="GRX9RHHAX5YRC">
+  <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+  <img alt="" border="0" src="https://www.paypalobjects.com/de_DE/i/scr/pixel.gif" width="1" height="1">
+  </form>
+
+  <p> If there are any issues please contact me. Feel free to re-analyze and download the image for free if something did not work.</p>
+
+</div>
+
+
+
+<!-- 4.99 -->
+<div id="four99">
+  <h4>Please click that button below. Once you paid the image should download.</h4>
+
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+  <input type="hidden" name="cmd" value="_s-xclick">
+  <input type="hidden" name="hosted_button_id" value="WLSFB2FDPPQKN">
+  <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+  <img alt="" border="0" src="https://www.paypalobjects.com/de_DE/i/scr/pixel.gif" width="1" height="1">
+  </form>
+
+    <p> If there are any issues please contact me. Feel free to re-analyze and download the image for free if something did not work.</p>
+</div>
+
+
+<!-- 9.99 -->
+<div id="nine99">
+  <h4>Please click that button below. Once you paid the image should download.</h4>
+
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+    <input type="hidden" name="cmd" value="_s-xclick">
+    <input type="hidden" name="hosted_button_id" value="CLHT29D63WYZ4">
+    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+    <img alt="" border="0" src="https://www.paypalobjects.com/de_DE/i/scr/pixel.gif" width="1" height="1">
+  </form>
+
+    <p> If there are any issues please contact me. Feel free to re-analyze and download the image for free if something did not work.</p>
+</div>
+
+      </div>
+    </section>
+
+
     <footer class="footer text-center">
       <div class="container">
 
@@ -288,12 +363,25 @@
     <script src="js/feedback.js"></script>
     <script src="js/form.js"></script>
 
+    <!-- Html 2 canvas --->
+
+    <script src="js/html2canvas.min.js"></script>
+    <script src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js"></script>
+    <script src="js/screenshot0.js"></script>
+    <script src="js/screenshot1.js"></script>
+    <script src="js/screenshot2.js"></script>
+    <script src="js/screenshot3.js"></script>
+
     <!-- My own scripts to analyze the chat file -->
     <script src="js/analyze.js"></script>
     <script src="js/stopwords.js"></script>
 
+
     <!-- SumoMe -->
     <script async>(function(s,u,m,o,j,v){j=u.createElement(m);v=u.getElementsByTagName(m)[0];j.async=1;j.src=o;j.dataset.sumoSiteId='3a188d739b5f8db07e60404f9b3a748f7e5664c60b71d9a9760bdfed904c77d3';v.parentNode.insertBefore(j,v)})(window,document,'script','//load.sumo.com/');</script>
+    <!--
+    <script async>(function(s,u,m,o,j,v){j=u.createElement(m);v=u.getElementsByTagName(m)[0];j.async=1;j.src=o;j.dataset.sumoSiteId='4ace5feecfd01c92a68c0e3cf50f18bd93a1d55585178a15098c3e2d6d56d7d3';v.parentNode.insertBefore(j,v)})(window,document,'script','//load.sumo.com/');</script>
+  -->
 
   </body>
 

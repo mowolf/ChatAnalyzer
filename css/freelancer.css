@@ -1,4 +1,8 @@
 /* Fontsize of dropdown menues*/
+.color-turquise {
+  background-color: rgba(24, 188, 156, 0.9);
+}
+
 .dropdown-menu {
     font-size: 13px;
   }
@@ -25,6 +29,22 @@
 }
 
 /* Stuff to hide by default*/
+#one99 {
+  display: none;
+}
+
+#four99 {
+  display: none;
+}
+
+#nine99 {
+  display: none;
+}
+
+#buy {
+  display: none;
+}
+
 .error {
   display: none;
 }

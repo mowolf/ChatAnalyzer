@@ -22,6 +22,8 @@ var unwantedWords = ["_","_weggelassen>", "_ommited>", "omesso>"];
 // TODO: filter out most common words
 // TODO: Most used emojies
 
+
+
 /// ----------------------------- \ Code /--------------------------------------
 wordsByUsage = [];
 // file listener
@@ -60,6 +62,7 @@ function readSingleFile(e) {
   document.getElementById("groupInfo").style.display = "none";
   document.getElementById("group").style.display = "none";
   document.getElementById("1on1chat").style.display = "none";
+
 
   // executes on load of file
   var reader = new FileReader();
@@ -128,6 +131,8 @@ function readSingleFile(e) {
     // show result page
     var d = document.getElementById("results");
     d.style.display = "block";
+
+    document.getElementById('buy').style.display = "block";
 
   };
   reader.readAsText(file);
