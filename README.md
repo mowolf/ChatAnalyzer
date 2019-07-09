@@ -38,7 +38,7 @@ Cheers! You are very welcome! Just submit a pull request. The goal of this tool 
 
 ### Add your language identifier for audio/video/pictures
 
-Please see the header of `analyze.js`. There you can add your identifiers.
+Please see the header of `main.js`. There you can add your identifiers.
 
 ### Markov Chain
 
