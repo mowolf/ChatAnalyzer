@@ -1,4 +1,4 @@
-![logo](http://alo724ayyildizelektrik.com/test1/logotype2.png)
+![logo](https://github.com/lev-kusanagi/ChatAnalyzer/blob/master/img/logo/logotype1.png?raw=true)
 
 A JavaScript application to analyze WhatsApp chat history locally in your browser.
 
