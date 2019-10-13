@@ -14,6 +14,7 @@ const str4Pic = [
 		"_‎bild",
 		"_‎media",
 		"_‎picture",
+        "<‎‎attached>"
 ],
 	// please add stopwords in other languages!
 	str4Sticks = ["_<‎sticker", "_‎sticker>", "_‎sticker", "_‎sticker"];
