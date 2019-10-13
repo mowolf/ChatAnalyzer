@@ -11,16 +11,21 @@ const str4Pic = [
 		"_<‎media",
 		"_<‎picture",
 		"_<‎attached",
-	],
+		"_‎bild",
+		"_‎media",
+		"_‎picture",
+],
 	// please add stopwords in other languages!
-	str4Sticks = ["_<‎sticker", "_sticker>"];
+	str4Sticks = ["_<‎sticker", "_‎sticker>", "_‎sticker", "_‎sticker"];
 // If you notice that your audio cont = 0 please add the identifier of your language in
 // ATTENTION: BE SURE TO COPY AND PASTE FROM YOUR CHAT LOG !!!!
-const str4Audio = ["_<‎audio"];
+const str4Audio = ["_<‎audio", "_‎audio", "_‎audio"];
+const str4Gif = ["_<‎GIF", "_‎GIF"];
 
 // If you notice words that are not part of your chat (i.g. identifiers) of your language in
 // ATTENTION: PLEASE BE SURE TO COPY AND PASTE FROM YOUR CHAT LOG !!!!
-const unwantedWords = ["_", "_weggelassen>", "_ommited>", "_omesso>"];
+const unwantedWords = ["_", "_weggelassen>", "_ommited>", "_omesso>", "_omitted", "_weggelassen", "_attached", "_‎"];
+
 
 /// ----------------------------- \ GENERAL Config END /--------------------------------
 
@@ -881,17 +886,15 @@ function getMostUsedWords(messages) {
 		}
 	}
 	// get sticker count
-	for (var s = 0; s < mostUsed.length; s++) {
-		// loop through mostused words with stop words for stickers
+	for (var j = 0; j < mostUsed.length; j++) {
 		for (var k = 0; k < str4Sticks.length; k++) {
-			if (mostUsed[s][0] == str4Sticks[k]) {
-				sentStickersIndex = s;
-				sentAudioCount = mostUsed[s][1];
+			if (mostUsed[j][0] == str4Sticks[k]) {
+				sentStickersIndex = j;
+				sentStickersCount = mostUsed[j][1];
 				break;
 			}
 		}
 	}
-
 	// remove it from array
 	mostUsed.splice(sentAudioIndex, 1);
 
