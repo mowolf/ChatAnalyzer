@@ -6,27 +6,25 @@
 // ATTENTION: BE SURE TO COPY AND PASTE FROM YOUR CHAT LOG !!!!
 //! Last two indexes include more than one word cause the chat log of later versions of WA only uses those combinations without
 //! any additional characters
-var str4Pic = [
-		"_<bild",
-		"_<media",
-		"_<picture",
-		"<attached>",
-		"Bild weggelassen",
-		"Ommited Image"
+const str4Pic = [
+		"_<‎bild",
+		"_<‎media",
+		"_<‎picture",
+		"_<‎attached",
 	],
 	// please add stopwords in other languages!
-	str4Sticks = ["Sticker weggelassen", "Ommited Sticker"];
+	str4Sticks = ["_<‎sticker", "_sticker>"];
 // If you notice that your audio cont = 0 please add the identifier of your language in
 // ATTENTION: BE SURE TO COPY AND PASTE FROM YOUR CHAT LOG !!!!
-var str4Audio = ["_<‎audio"];
+const str4Audio = ["_<‎audio"];
 
 // If you notice words that are not part of your chat (i.g. identifiers) of your language in
 // ATTENTION: PLEASE BE SURE TO COPY AND PASTE FROM YOUR CHAT LOG !!!!
-var unwantedWords = ["_", "_weggelassen>", "_ommited>", "omesso>"];
+const unwantedWords = ["_", "_weggelassen>", "_ommited>", "_omesso>"];
 
 /// ----------------------------- \ GENERAL Config END /--------------------------------
 
-// TODO: add group support (make carousell for groups)
+// TODO: add group support (make carousel for groups)
 // TODO: add words per messages and plot the change over time
 // TODO: Make sure all variables are resetted when choosing the next file! -> write initalizer
 // TODO: filter out most common words
@@ -205,10 +203,10 @@ function displayChat(content) {
 			"<p> Pictures sent: <b>" +
 			sentPicsCount +
 			"</b></p>" +
-			"<p> Audio sent:<b>" +
+			"<p> Audio sent: <b>" +
 			sentAudioCount +
 			"</b></p>" +
-			"<p> Stickers sent:<b/>" +
+			"<p> Stickers sent: <b/>" +
 			sentStickersCount +
 			"</b></p>";
 		document.getElementById("users").appendChild(div);
