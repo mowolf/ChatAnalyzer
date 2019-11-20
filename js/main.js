@@ -41,6 +41,34 @@ wordsByUsage = [];
 // file listener
 document.getElementById("file-input").addEventListener("change", readSingleFile, false);
 
+// Upload file with drag and drop
+// https://www.sitepoint.com/html5-file-drag-and-drop/
+document.getElementById("filedrag").addEventListener("dragover", FileDragHover, false);
+document.getElementById("filedrag").addEventListener("dragleave", FileDragHover, false);
+document.getElementById("filedrag").addEventListener("drop", FileSelectHandler, false);
+document.getElementById("filedrag").addEventListener("click", FileClick, false);
+document.getElementById("filedrag").style.display = "block";
+
+function FileDragHover(e) {
+	e.stopPropagation();
+	e.preventDefault();
+	e.target.className = (e.type == "dragover" ? "hover" : "");
+}
+
+function FileSelectHandler(e) {
+	// cancel event and hover styling
+	FileDragHover(e);
+
+	// Put file object where function readsinglefile wants
+	e.target.files = e.dataTransfer.files;
+
+	readSingleFile(e);
+}
+
+function FileClick(e) {
+	document.getElementById("file-input").click();
+}
+
 //Read File
 function readSingleFile(e) {
 	// handle file

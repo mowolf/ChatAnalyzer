@@ -29,6 +29,10 @@
 
     <!-- Custom styles for this template -->
     <link href="css/freelancer.css" rel="stylesheet">
+
+    <!-- Custom styles -->
+    <link href="css/custom.css" rel="stylesheet">
+
   </head>
 
   <body id="page-top">
@@ -48,11 +52,12 @@
         <!-- Upload Field -->
 
         <div id="upload" class="text-center">
-          <label class="btn btn-xl mt-4 btn-secondary">
-            <i class="fa fa-mouse-pointer mr-2"></i>
-            Select your file! <input type="file" accept=".txt,.zip" id="file-input" hidden>
-          </label>
 
+          <div id="filedrag">
+            <h2>Drop files here</h2>
+            <h2>or click to upload!</h2> 
+            <input type="file" accept=".txt,.zip" id="file-input" hidden>
+          </div>
           <p> </p>
 
           <h5 class="text-center text-small" id="uBlock">If it does not work make sure to disable extentions like uBlock (or visit this site in incognito mode)!!</h5>
