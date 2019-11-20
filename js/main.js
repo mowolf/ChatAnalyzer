@@ -96,7 +96,6 @@ function readSingleFile(e) {
 	document.getElementById("usersWords").innerHTML = "";
 
 	// hide Stuff
-	document.getElementById("uBlock").style.display = "none";
 	document.getElementById("groupInfo").style.display = "none";
 	document.getElementById("group").style.display = "none";
 	document.getElementById("1on1chat").style.display = "none";
