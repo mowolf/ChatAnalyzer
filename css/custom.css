@@ -5,16 +5,17 @@
 	text-align: center;
 	padding: 1em 0;
 	margin: 1em 0;
-	color: #555;
-	border: 2px dashed #555;
+	color: #fff;
+	border: 2px dashed #fff;
 	border-radius: 7px;
 	cursor: default;
 }
 
-#filedrag.hover
+#filedrag:hover
 {
-	color: #555;
-	color: #555;
+	cursor: pointer;
+	color: #2C3E50;
 	border-style: solid;
+	border-color: #2C3E50;
 	box-shadow: inset 0 3px 4px #555;
 }
